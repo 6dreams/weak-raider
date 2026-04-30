@@ -2,14 +2,12 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"time"
 	"weakRaider/internal/config"
 	"weakRaider/internal/database"
 	myLogger "weakRaider/internal/logger"
 
-	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
@@ -28,7 +26,6 @@ func main() {
 	}
 
 	cfg := config.GetConfigInstance()
-	migration := flag.Bool("migration", true, "Defines the migration start option")
 
 	logger = myLogger.LogInit(cfg.Project.Debug)
 
@@ -49,11 +46,4 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed init postgres")
 	}
 	defer db.Close()
-
-	if *migration {
-		if err = goose.Up(db.DB, cfg.Database.Migrations); err != nil {
-			logger.Error().Err(err).Msg("Migration failed")
-			return
-		}
-	}
 }
