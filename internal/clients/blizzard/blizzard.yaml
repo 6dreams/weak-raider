@@ -175,5 +175,3 @@ components:
               enchantment_id:
                 type: integer
                 description: Internal ID
-# todo: sockets, enchantments,
-
