@@ -30,16 +30,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Character'
-# id": 4940972,
-    #    "name": "Анхулиос",
-    #    "realm": "Gordunni",
-    #    "class": "Death Knight",
-    #    "role": "Melee",
-    #    "rank": "Main",
-    #    "status": "tracking",
-    #    "note": null,
-    #    "blizzard_id": 261449134,
-    #    "tracking_since": "2026-03-19T22:32:26.000Z"
+
     Character:
       type: object
       required:
