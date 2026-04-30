@@ -1,0 +1,179 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: wowaudit API
+servers:
+  - url: https://eu.api.blizzard.com
+  - url: https://oauth.battle.net
+paths:
+  /token:
+    post:
+      operationId: token
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthTokenResponse"
+          description: Successful login
+
+  /profile/wow/character/{realm}/{character}/equipment?locale=en_US:
+    get:
+      operationId: equipment
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/Realm'
+        - $ref: '#/components/parameters/Character'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileEquipmentResponse'
+          description: Players equipment
+
+components:
+  parameters:
+    Authorization:
+      name: Authorization
+      description: blizzard auth header
+      required: true
+      schema:
+        type: string
+      in: header
+    Namespace:
+      name: Battlenet-Namespace
+      description: Namespace.
+      required: true
+      schema:
+        type: string
+        enum:
+          - static-eu
+          - profile-eu
+          - dynamic-eu
+      in: header
+    Realm:
+      name: realm
+      description: Realm to query
+      required: true
+      schema:
+        type: string
+      in: path
+    Character:
+      name: character
+      description: Character to query
+      required: true
+      schema:
+        type: string
+      in: path
+
+  schemas:
+    AuthTokenResponse:
+      type: object
+      required: 
+        - access_token
+      properties:
+        access_token:
+          type: string
+          description: Access Token for future use.
+
+    ProfileEquipmentResponse:
+      type: object
+      required:
+        - equipped_items
+      properties:
+        equipped_items:
+          type: array
+          description: List of equipped by player items.
+          items:
+            $ref: '#/components/schemas/ProfileEquipmentItem'
+
+    ProfileEquipmentItem:
+      type: object
+      required:
+        - item
+        - slot
+      properties:
+        item:
+          type: object
+          description: Information about item
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              description: Item ID
+        bonus_list:
+          type: array
+          description: Bonus ID used in simc
+          items:
+            type: integer
+            description: Bonus ID
+        slot:
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              description: Uppercased item slot
+        name:
+          type: string
+          description: In-game item's name
+        stats:
+          type: array
+          description: Item stats.
+          items:
+            type: object
+            required:
+              - type
+              - value
+            properties:
+              type:
+                type: string
+                description: Uppercased stat name
+              value:
+                type: integer
+                description: Value that item grants to player
+              is_negated:
+                type: boolean
+                description: Is obsolete stat to character
+        sockets:
+          type: array
+          description: Item's sockets
+          items:
+            type: object
+            properties:
+              item:
+                type: object
+                description: Item socketed in socket
+                required:
+                  - id
+                  - name
+                properties:
+                  id:
+                    type: integer
+                    description: Socketed item id
+                  name:
+                    type: string
+                    description: Socketed item name
+        enchantments:
+          type: array
+          items:
+            type: object
+            description: enchantment info
+            required:
+              - display_string
+              - enchantment_id
+            properties:
+              display_string:
+                type: string
+                description: In-game name
+              enchantment_id:
+                type: integer
+                description: Internal ID
+# todo: sockets, enchantments,
+

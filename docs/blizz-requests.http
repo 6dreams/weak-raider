@@ -1,0 +1,25 @@
+#### Get Token
+POST https://oauth.battle.net/token
+Authorization: Basic {{client_id}} {{client_secret}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+
+> {% client.global.set("access_token", response.body.access_token); %}
+
+### Get titles data.
+GET https://eu.api.blizzard.com/data/wow/title/index
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Get Player Gear
+GET https://eu.api.blizzard.com/profile/wow/character/silvermoon/glead/equipment?locale=en_US
+Battlenet-Namespace: profile-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+#### Get Item info
+GET https://eu.api.blizzard.com/data/wow/item/249997?namespace=static-12.0.1_65617-eu
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json

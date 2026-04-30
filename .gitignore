@@ -1,3 +1,4 @@
 .env
 .idea
 *.gen.go
+*.private.env.json

@@ -1,0 +1,7 @@
+package: blizzard
+generate:
+  client: true
+  models: true
+output: internal/clients/blizzard/client.gen.go
+output-options:
+  skip-prune: true
