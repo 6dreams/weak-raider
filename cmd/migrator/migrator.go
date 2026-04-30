@@ -12,11 +12,11 @@ import (
 )
 
 func main() {
-	if err := config.ReadConfigYML("config.yml"); err != nil {
+	cfg, err := config.ReadConfig("config.yml")
+	if err != nil {
 		log.Fatal().Err(err).Msg("Failed init configuration")
 	}
 
-	cfg := config.GetConfigInstance()
 	migration := flag.Bool("migration", true, "Defines the migration start option")
 
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",

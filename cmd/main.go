@@ -17,11 +17,10 @@ var (
 )
 
 func main() {
-	if err := config.ReadConfigYML("config.yml"); err != nil {
+	cfg, err := config.ReadConfig("config.yml")
+	if err != nil {
 		log.Fatal().Err(err).Msg("Failed init configuration")
 	}
-
-	cfg := config.GetConfigInstance()
 
 	logger = myLogger.LogInit(cfg.Project.Debug)
 

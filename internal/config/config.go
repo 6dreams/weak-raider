@@ -1,11 +1,9 @@
 package config
 
 import (
-	"os"
-	"path/filepath"
+	"github.com/ilyakaznacheev/cleanenv"
+	"github.com/joho/godotenv"
 	"time"
-
-	"gopkg.in/yaml.v3"
 )
 
 // Build information -ldflags .
@@ -14,25 +12,14 @@ const (
 	commitHash string = "-"
 )
 
-var cfg *Config
-
-// GetConfigInstance returns service config
-func GetConfigInstance() Config {
-	if cfg != nil {
-		return *cfg
-	}
-
-	return Config{}
-}
-
 // Database - contains all parameters database connection.
 type Database struct {
-	Host        string `yaml:"host"`
-	Port        string `yaml:"port"`
-	User        string `yaml:"user"`
-	Password    string `yaml:"password"`
+	Host        string `env:"WR_PG_HOST"`
+	Port        string `env:"WR_PG_PORT"`
+	User        string `env:"WR_PG_USER"`
+	Password    string `env:"WR_PG_PASS"`
 	Migrations  string `yaml:"migrations"`
-	Name        string `yaml:"name"`
+	Name        string `env:"WR_PG_NAME"`
 	SslMode     string `yaml:"sslmode"`
 	Driver      string `yaml:"driver"`
 	Connections DBCons `yaml:"connections"`
@@ -60,27 +47,19 @@ type Config struct {
 	Database Database `yaml:"database"`
 }
 
-// ReadConfigYML - read configurations from file and init instance Config.
-func ReadConfigYML(filePath string) error {
-	if cfg != nil {
-		return nil
+// ReadConfig - read configurations from file and init instance Config.
+func ReadConfig(filePath string) (*Config, error) {
+	if err := godotenv.Load(".env"); err != nil {
+		return nil, err
 	}
 
-	file, err := os.Open(filepath.Clean(filePath))
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = file.Close()
-	}()
-
-	decoder := yaml.NewDecoder(file)
-	if err := decoder.Decode(&cfg); err != nil {
-		return err
+	var cfg Config
+	if err := cleanenv.ReadConfig(filePath, &cfg); err != nil {
+		return nil, err
 	}
 
 	cfg.Project.Version = version
 	cfg.Project.CommitHash = commitHash
 
-	return nil
+	return &cfg, nil
 }
