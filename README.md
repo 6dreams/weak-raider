@@ -2,6 +2,10 @@
 Tooling for World of Warcraft.
 
 # Development
+```bash
+cp .env.dist .env
+```
+
 Run docker-compose:
 ```bash
 docker-compose up
