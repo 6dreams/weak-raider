@@ -38,10 +38,11 @@ func main() {
 	logger.Debug().Msg("gorm connection succesfully created")
 	if err != nil {
 		fmt.Println("-")
-		logger.Fatal().Err(err).Msg("Failed init gorm")
+		logger.Fatal().Err(err).Msg("failed init gorm")
 	}
 
 	sqlDB, err := db.DB()
+	logger.Debug().Msg("gorm connection succesfully created")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed get sqlDB from gorm")
 	}
