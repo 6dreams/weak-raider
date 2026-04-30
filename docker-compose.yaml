@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:latest
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weak-raider
+      APP_DB_USER: docker
+      APP_DB_PASS: docker
+    networks:
+      - wrnw
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+    driver: local
+
+
+networks:
+  wrnw:
+    driver: bridge

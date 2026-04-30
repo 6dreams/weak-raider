@@ -1,0 +1,21 @@
+project:
+  name: Weak Raider
+  debug: true
+  environment: development
+
+database:
+  host: localhost  # for local launch
+  # host: postgres
+
+  port: 5432
+  user: postgres
+  password: postgres
+  name: weak-raider
+  sslmode: disable
+  migrations: migrations
+  driver: pgx
+  connections:
+    maxOpenCons: 5
+    maxIdleCons: 5
+    connMaxIdleTime: 5m
+    connMaxLifeTime: 5m
