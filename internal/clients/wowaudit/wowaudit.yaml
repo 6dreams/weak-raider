@@ -8,8 +8,8 @@ paths:
   /v1/characters:
     get:
       operationId: getCharacters
-      security:
-        - bearerAuth: [ ]
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
       responses:
         200:
           content:
@@ -19,11 +19,14 @@ paths:
           description: Successful response
 
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+  parameters:
+    Authorization:
+      name: Authorization
+      description: wowaudit auth header
+      required: true
+      schema:
+        type: string
+      in: header
 
   schemas:
     CharactersResponse:
