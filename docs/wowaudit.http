@@ -1,0 +1,3 @@
+### Get Players
+GET https://wowaudit.com/v1/characters
+Authorization: {{wowaudit_secret}}

@@ -18,6 +18,12 @@ Battlenet-Namespace: profile-eu
 Authorization: Bearer {{access_token}}
 Accept: application/json
 
+### Get Player Gear
+GET https://eu.api.blizzard.com/profile/wow/character/silvermoon/glead/specializations?locale=en_US
+Battlenet-Namespace: profile-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
 #### Get Item info
 GET https://eu.api.blizzard.com/data/wow/item/249997?namespace=static-12.0.1_65617-eu
 Battlenet-Namespace: static-eu

@@ -41,6 +41,7 @@ components:
         - realm
         - class
         - rank
+        - role
         - note
         - blizzard_id
       properties:
@@ -56,6 +57,9 @@ components:
         rank:
           type: string
           description: Rank in wowaudit
+        role:
+          type: string
+          description: Player role in raid
         note:
           type: string
           nullable: true
