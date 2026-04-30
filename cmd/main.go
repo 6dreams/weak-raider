@@ -1,19 +1,15 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"time"
 	"weakRaider/internal/config"
-	"weakRaider/internal/database"
 	myLogger "weakRaider/internal/logger"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
-	_ "github.com/jackc/pgx/v4"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
@@ -38,12 +34,17 @@ func main() {
 		cfg.Database.SslMode,
 	)
 
-	initCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	db, err := database.NewPostgres(initCtx, dsn, cfg.Database.Driver, &cfg.Database.Connections)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	logger.Debug().Msg("gorm connection succesfully created")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed init postgres")
+		fmt.Println("-")
+		logger.Fatal().Err(err).Msg("Failed init gorm")
 	}
-	defer db.Close()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		logger.Fatal().Err(err).Msg("failed get sqlDB from gorm")
+	}
+	defer sqlDB.Close()
+
 }

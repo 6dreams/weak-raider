@@ -1,19 +1,14 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
-	"time"
 	"weakRaider/internal/config"
-	"weakRaider/internal/database"
 
 	"github.com/pressly/goose/v3"
 	"github.com/rs/zerolog/log"
-
-	_ "github.com/jackc/pgx/v4"
-	_ "github.com/jackc/pgx/v4/stdlib"
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -33,17 +28,21 @@ func main() {
 		cfg.Database.SslMode,
 	)
 
-	initCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	db, err := database.NewPostgres(initCtx, dsn, cfg.Database.Driver, &cfg.Database.Connections)
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	log.Debug().Msg("gorm connection succesfully created")
 	if err != nil {
-		log.Fatal().Err(err).Msg("Failed init postgres")
+		fmt.Println("-")
+		log.Fatal().Err(err).Msg("Failed init gorm")
 	}
-	defer db.Close()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed get sqlDB from gorm")
+	}
+	defer sqlDB.Close()
 
 	if *migration {
-		if err = goose.Up(db.DB, cfg.Database.Migrations); err != nil {
+		if err = goose.Up(sqlDB, cfg.Database.Migrations); err != nil {
 			log.Error().Err(err).Msg("Migration failed")
 			return
 		}
