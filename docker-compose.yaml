@@ -1,8 +1,10 @@
 services:
   postgres:
     image: postgres:latest
+    env_file:
+      - .env
     healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+      test: [ "CMD", "pg_isready", "-q", "-d", "$WR_PG_NAME", "-U", "$WR_PG_USER" ]
       timeout: 45s
       interval: 10s
       retries: 10
@@ -10,15 +12,13 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: weak-raider
-      APP_DB_USER: docker
-      APP_DB_PASS: docker
+      POSTGRES_USER: $WR_PG_USER
+      POSTGRES_PASSWORD: $WR_PG_PASS
+      POSTGRES_DB: $WR_PG_NAME
     networks:
       - wrnw
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
 
 volumes:
   pgdata:
