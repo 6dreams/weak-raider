@@ -2,20 +2,20 @@ package model
 
 import "time"
 
-type guild struct {
-	id           int       `db:"guild_id"`
-	name         string    `db:"name"`
-	wowaudit_key string    `db:"wowaudit_key"`
-	updated      time.Time `db:"updated"`
+type Guild struct {
+	Id           int       `db:"guild_id"`
+	Name         string    `db:"name"`
+	Wowaudit_key string    `db:"wowaudit_key"`
+	Updated      time.Time `db:"updated"`
 }
 
-type champion struct {
-	id          int       `db:"champion_id"`
-	name        string    `db:"name"`
-	class       string    `db:"class"`
-	realm       string    `db:"realm"`
-	note        string    `db:"note"`
-	guild_id    int       `db:"guild_id"`
-	blizzard_id int       `db:"blizzard_id"`
-	updated     time.Time `db:"updated"`
+type Champion struct {
+	Id          int       `db:"champion_id"`
+	Name        string    `db:"name"`
+	Class       string    `db:"class"`
+	Realm       string    `db:"realm"`
+	Note        string    `db:"note"`
+	Guild_id    int       `db:"guild_id"`
+	Blizzard_id int       `db:"blizzard_id"`
+	Updated     time.Time `db:"updated"`
 }
