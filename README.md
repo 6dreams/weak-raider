@@ -4,6 +4,8 @@ Tooling for World of Warcraft.
 # Development
 ```bash
 cp .env.dist .env
+go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
+make generate
 ```
 
 Run docker-compose:

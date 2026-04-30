@@ -1,0 +1,5 @@
+package: wowaudit
+generate:
+  client: true
+  models: true
+output: internal/clients/wowaudit/client.gen.go

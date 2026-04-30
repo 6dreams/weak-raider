@@ -1,0 +1,71 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: wowaudit API
+servers:
+  - url: https://wowaudit.com
+paths:
+  /v1/characters:
+    get:
+      operationId: getCharacters
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CharactersResponse"
+          description: Successful response
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CharactersResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Character'
+# id": 4940972,
+    #    "name": "Анхулиос",
+    #    "realm": "Gordunni",
+    #    "class": "Death Knight",
+    #    "role": "Melee",
+    #    "rank": "Main",
+    #    "status": "tracking",
+    #    "note": null,
+    #    "blizzard_id": 261449134,
+    #    "tracking_since": "2026-03-19T22:32:26.000Z"
+    Character:
+      type: object
+      required:
+        - name
+        - realm
+        - class
+        - rank
+        - note
+        - blizzard_id
+      properties:
+        name:
+          type: string
+          description: Character name
+        realm:
+          type: string
+          description: Character's realms
+        class:
+          type: string
+          description: Class name
+        rank:
+          type: string
+          description: Rank in wowaudit
+        note:
+          type: string
+          nullable: true
+          description: Note on player in wowaudit
+        blizzard_id:
+          type: integer
+          description: Blizzard API ID.
