@@ -1,4 +1,4 @@
-package schema_diff
+package main
 
 import (
 	"fmt"

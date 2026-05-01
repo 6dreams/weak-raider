@@ -56,5 +56,4 @@ func main() {
 	//server := server.NewServer(cfg.Project.Port, handlers.Handler())
 	//
 	//server.Run()
-
 }

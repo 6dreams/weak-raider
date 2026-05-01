@@ -1,12 +1,12 @@
 .PHONY: run
 
 run:
-	go run cmd/main.go
+	go run cmd/main.go -config config.yaml -env .env
 
 .PHONY: migrate
 
 migrate:
-	go run cmd/migrator/migrator.go
+	go run cmd/migrator/migrator.go -config config.yaml -env .env
 
 gen:
 	oapi-codegen -config internal/clients/wowaudit/codegen.yaml internal/clients/wowaudit/wowaudit.yaml
