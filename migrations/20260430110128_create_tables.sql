@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS "character" (
   role text NOT NULL,
   guild_id BIGINT,
   updated_at TIMESTAMP,
+  wowaudit_updated_at TIMESTAMP,
+
   FOREIGN KEY (guild_id) REFERENCES guild(id)
 );
 -- +goose Down
