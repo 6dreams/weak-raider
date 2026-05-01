@@ -9,7 +9,7 @@ type Season struct {
 	// Идентификатор сезона по Blizzard, берётся из API Blizzard.
 	BlizzardId sql.NullInt64 `gorm:"column:blizzard_id;type:bigint;null"`
 
-	// Идентификатор сезона по WoW Audit, берётся из API WoW Audit.
+	// Идентификатор сезона по WoWAudit, берётся из API WoWAudit.
 	WowAuditId sql.NullInt64 `gorm:"column:wow_audit_id;type:bigint;null"`
 
 	// Название сезона (берётся из wowaudit)

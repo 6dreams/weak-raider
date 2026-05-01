@@ -9,7 +9,7 @@ type Guild struct {
 	// Название гильдии.
 	Name string `gorm:"column:name;type:text;not null"`
 
-	// Приватный ключ для работы с API WoW Audit.
+	// Приватный ключ для работы с API WoWAudit.
 	WowauditKey string `gorm:"column:wow_audit_key;type:text;not null"`
 
 	//Время последнего обновления информации о гильдии.

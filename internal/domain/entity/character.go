@@ -8,7 +8,7 @@ type Character struct {
 	// Идентификатор персонажа, генерируется автоматически.
 	ID int `gorm:"primary_key;column:id;type:bigserial;not null"`
 
-	//Информация о персонаже, берётся из API WowAudit.
+	//Информация о персонаже, берётся из API WoWAudit.
 	Name  string `gorm:"column:name;type:text;not null"`
 	Class string `gorm:"column:class;type:text;not null"`
 	Rank  string `gorm:"column:rank;type:text;not null"`

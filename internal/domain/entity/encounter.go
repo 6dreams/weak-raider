@@ -9,7 +9,7 @@ type Encounter struct {
 	// Имя босса.
 	Name string `gorm:"column:name;type:text;not null"`
 
-	// Идентификатор боя, берётся из API Warcraft Logs.
+	// Идентификатор боя, берётся из API WarcraftLogs.
 	LogsEncounterID int `gorm:"column:logs_encounter_id;type:int;not null"`
 
 	// Время последнего обновления информации о бое.
