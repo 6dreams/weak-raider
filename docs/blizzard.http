@@ -7,18 +7,13 @@ grant_type=client_credentials
 
 > {% client.global.set("access_token", response.body.access_token); %}
 
-### Get titles data.
-GET https://eu.api.blizzard.com/data/wow/title/index
-Battlenet-Namespace: static-eu
-Authorization: Bearer {{access_token}}
-
 ### Get Player Gear
 GET https://eu.api.blizzard.com/profile/wow/character/silvermoon/glead/equipment?locale=en_US
 Battlenet-Namespace: profile-eu
 Authorization: Bearer {{access_token}}
 Accept: application/json
 
-### Get Player Gear
+### Get Player Talents
 GET https://eu.api.blizzard.com/profile/wow/character/silvermoon/glead/specializations?locale=en_US
 Battlenet-Namespace: profile-eu
 Authorization: Bearer {{access_token}}
@@ -30,28 +25,12 @@ Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}
 Accept: application/json
 
-### Journal: Index
-GET https://eu.api.blizzard.com/data/wow/journal-expansion/index?locale=en_US
-Battlenet-Namespace: static-eu
-Authorization: Bearer {{access_token}}
-
-### Journal: Current Season
-GET https://eu.api.blizzard.com/data/wow/journal-expansion/505?locale=en_US
-Battlenet-Namespace: static-eu
-Authorization: Bearer {{access_token}}
-
-
-### Journal: Current Season - Keystone Dungeons
-GET https://eu.api.blizzard.com/data/wow/journal-instance/278?locale=en_US
-Battlenet-Namespace: static-eu
-Authorization: Bearer {{access_token}}
-
-### Journal: Current Season - Pit of Saron
-GET https://eu.api.blizzard.com/data/wow/journal-encounter/609?locale=en_US
-Battlenet-Namespace: static-eu
-Authorization: Bearer {{access_token}}
-
 ### Item: Rimewoven Silks
 GET https://eu.api.blizzard.com/data/wow/item/133504?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Item: Ring
+GET https://eu.api.blizzard.com/data/wow/item/250247?locale=en_US
 Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}

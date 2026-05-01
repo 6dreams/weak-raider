@@ -43,10 +43,22 @@ type Project struct {
 	CommitHash  string
 }
 
+type Secrets struct {
+	Blizzard struct {
+		Client string `env:"WR_BLIZZARD_CLIENT"`
+		Secret string `env:"WR_BLIZZARD_SECRET"`
+	}
+	Logs struct {
+		Client string `env:"WR_WARCRAFTLOGS_CLIENT"`
+		Secret string `env:"WR_WARCRAFTLOGS_SECRET"`
+	}
+}
+
 // Config - contains all configuration parameters in config package.
 type Config struct {
 	Project  Project  `yaml:"project"`
 	Database Database `yaml:"database"`
+	Auth     Secrets
 }
 
 // ReadConfig - read configurations from file and init instance Config.

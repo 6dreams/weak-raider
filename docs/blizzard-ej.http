@@ -1,0 +1,15 @@
+### Journal: Journal Expansion
+### Получает список всех дополнений и текущего сезона.
+GET https://eu.api.blizzard.com/data/wow/journal-expansion/index?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Journal: Детали дополнения. Содержит список рейдов и подземелий.
+GET https://eu.api.blizzard.com/data/wow/journal-expansion/505?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Journal: Детали о подземелье. Список энкаунтеров.
+GET https://eu.api.blizzard.com/data/wow/journal-instance/1307?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
