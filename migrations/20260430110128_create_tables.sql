@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS guild(
   id BIGSERIAL PRIMARY KEY,
   name text NOT NULL,
   wowaudit_key TEXT NOT NULL,
-  updated_at TIMESTAMP
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS "character" (
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS "character" (
   role text NOT NULL,
   guild_id BIGINT,
   updated_at TIMESTAMP,
-  wowaudit_updated_at TIMESTAMP,
+  wowaudit_updated_at TIMESTAMPTZ DEFAULT NOW(),
 
   FOREIGN KEY (guild_id) REFERENCES guild(id)
 );
