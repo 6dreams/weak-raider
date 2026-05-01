@@ -1,19 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"weakRaider/internal/config"
-	"weakRaider/internal/handlers"
-	myLogger "weakRaider/internal/logger"
-	"weakRaider/internal/repo"
-	"weakRaider/internal/server"
-	"weakRaider/internal/service"
-
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"weakRaider/internal/app"
 )
 
 var (
@@ -21,42 +11,50 @@ var (
 )
 
 func main() {
-	cfg, err := config.ReadConfig("config.yml")
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed init configuration")
+	application := app.New()
+	if err := application.Initialize(); err != nil {
+		log.Fatal().Err(err).Msg("application initialization failed")
+
+		return
 	}
+	application.Run()
 
-	logger = myLogger.LogInit(cfg.Project.Debug)
-
-	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
-		cfg.Database.Host,
-		cfg.Database.Port,
-		cfg.Database.User,
-		cfg.Database.Password,
-		cfg.Database.Name,
-		cfg.Database.SslMode,
-	)
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	logger.Debug().Msg("gorm connection succesfully created")
-	if err != nil {
-		fmt.Println("-")
-		logger.Fatal().Err(err).Msg("failed init gorm")
-	}
-
-	sqlDB, err := db.DB()
-	logger.Debug().Msg("gorm connection succesfully created")
-
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed get sqlDB from gorm")
-	}
-	defer sqlDB.Close()
-
-	repo := repo.NewRepo(db)
-	service := service.NewService(repo, logger)
-	handlers := handlers.NewHandler(service)
-	server := server.NewServer(cfg.Project.Port, handlers.Handler())
-
-	server.Run()
+	//cfg, err := config.ReadConfig()
+	//if err != nil {
+	//	log.Fatal().Err(err).Msg("Failed init configuration")
+	//}
+	//
+	//logger = myLogger.LogInit(cfg.Project.Debug)
+	//
+	//dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
+	//	cfg.Database.Host,
+	//	cfg.Database.Port,
+	//	cfg.Database.User,
+	//	cfg.Database.Password,
+	//	cfg.Database.Name,
+	//	cfg.Database.SslMode,
+	//)
+	//
+	//db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	//logger.Debug().Msg("gorm connection succesfully created")
+	//if err != nil {
+	//	fmt.Println("-")
+	//	logger.Fatal().Err(err).Msg("failed init gorm")
+	//}
+	//
+	//sqlDB, err := db.DB()
+	//logger.Debug().Msg("gorm connection succesfully created")
+	//
+	//if err != nil {
+	//	logger.Fatal().Err(err).Msg("failed get sqlDB from gorm")
+	//}
+	//defer sqlDB.Close()
+	//
+	//repo := repo.NewRepo(db)
+	//service := service.NewService(repo, logger)
+	//handlers := handlers.NewHandler(service)
+	//server := server.NewServer(cfg.Project.Port, handlers.Handler())
+	//
+	//server.Run()
 
 }

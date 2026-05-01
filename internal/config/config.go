@@ -1,6 +1,9 @@
 package config
 
 import (
+	"flag"
+	"fmt"
+	"os"
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -62,13 +65,18 @@ type Config struct {
 }
 
 // ReadConfig - read configurations from file and init instance Config.
-func ReadConfig(filePath string) (*Config, error) {
-	if err := godotenv.Load(".env"); err != nil {
+func ReadConfig() (*Config, error) {
+	err, env, config := getConfigFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := godotenv.Load(env); err != nil {
 		return nil, err
 	}
 
 	var cfg Config
-	if err := cleanenv.ReadConfig(filePath, &cfg); err != nil {
+	if err := cleanenv.ReadConfig(config, &cfg); err != nil {
 		return nil, err
 	}
 
@@ -76,4 +84,26 @@ func ReadConfig(filePath string) (*Config, error) {
 	cfg.Project.CommitHash = commitHash
 
 	return &cfg, nil
+}
+
+func getConfigFiles() (error, string, string) {
+	var env, conf string
+
+	flag.StringVar(&env, "env", ".env", "path to environment file")
+	flag.StringVar(&conf, "config", "", "path to config file")
+	flag.Parse()
+
+	if conf == "" {
+		return fmt.Errorf("config file not set. Use -config"), "", ""
+	}
+
+	if _, err := os.Stat(env); os.IsNotExist(err) {
+		return fmt.Errorf("environment file does not exist: %v", conf), "", ""
+	}
+
+	if _, err := os.Stat(conf); os.IsNotExist(err) {
+		return fmt.Errorf("config file does not exist: %v", conf), "", ""
+	}
+
+	return nil, env, conf
 }

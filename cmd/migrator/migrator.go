@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.ReadConfig("config.yml")
+	cfg, err := config.ReadConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed init configuration")
 	}

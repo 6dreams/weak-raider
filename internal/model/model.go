@@ -19,6 +19,8 @@ type Character struct {
 	Note      string    `db:"note"`
 	GuildId   int       `db:"guild_id"`
 	UpdatedAt time.Time `db:"updated_at"`
+
+	// todo: wowaudit update time
 }
 
 type Season struct {
