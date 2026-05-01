@@ -2,16 +2,22 @@ package main
 
 import (
 	"fmt"
-	"gorm.io/gorm"
 	"log"
 	"strings"
 	baseApp "weakRaider/internal/app"
 	"weakRaider/internal/domain/entity"
+
+	"gorm.io/gorm"
 )
 
 var entities = []interface{}{
-	entity.Season{},
+	entity.Character{},
+	entity.Encounter{},
+	entity.Guild{},
 	entity.Instance{},
+	entity.Item{},
+	entity.Season{},
+	entity.Slot{},
 }
 
 func main() {
