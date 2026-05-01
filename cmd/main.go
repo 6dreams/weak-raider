@@ -12,5 +12,8 @@ func main() {
 
 		return
 	}
+
+	log.Info().Msg("app initialized, starting.")
+
 	app.Run()
 }

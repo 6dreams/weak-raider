@@ -13,6 +13,7 @@ type Instance struct {
 	// Название подземелья.
 	Name string `gorm:"column:name;type:text;not null"`
 
+	// Время последнего обновления.
 	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now()"`
 }
 

@@ -2,26 +2,27 @@
 Tooling for World of Warcraft.
 
 # Development
+## Инициализация проекта
 ```bash
 cp .env.dist .env
 go install github.com/oapi-codegen/oapi-codegen
-make gen
 ```
 
-Run docker-compose:
+Запустить docker-compose (если база будет в docker):
 ```bash
 docker-compose up
 ```
 
-Run migrations:
+## Запуск приложения
 ```bash
-go run ./cmd/migrator/migrator.go
+make run
 ```
 
-Run app:
+## Получение изменённой схемы для применения миграций
 ```bash
-go run ./cmd/main.go
+make schema-diff
 ```
+
 # Цели
 * Проверка талантов рейдеров и сравнение их с часто используемыми.
 * Оценка требуемых предметов, какие предметы с рейда или подземелий дадут +урон и сколько

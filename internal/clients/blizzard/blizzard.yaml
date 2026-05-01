@@ -25,6 +25,19 @@ paths:
             schema:
               $ref: '#/components/schemas/AuthTokenRequest'
 
+  /data/wow/journal-expansion/index?locale=en_US:
+    get:
+      operationId: journalExpansionIndex
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JEIndexResponse'
 
   /profile/wow/character/{realm}/{character}/equipment?locale=en_US:
     get:
@@ -192,3 +205,26 @@ components:
               enchantment_id:
                 type: integer
                 description: Internal ID
+
+    JEIndexResponse:
+      type: object
+      required:
+        - tiers
+      properties:
+        tiers:
+          type: array
+          description: Список дополнений
+          items:
+            type: object
+            required:
+              - name
+              - id
+            properties:
+              name:
+                type: string
+                description: Название дополнения
+                example: Cataclysm
+              id:
+                type: integer
+                description: Идентификатор дополнения
+                example: 74

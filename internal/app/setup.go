@@ -6,8 +6,14 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
+	"net/http"
 	"time"
+	"weakRaider/internal/clients"
+	"weakRaider/internal/clients/blizzard"
+	"weakRaider/internal/clients/warcraftlogs"
+	"weakRaider/internal/clients/wowaudit"
 	"weakRaider/internal/config"
+	"weakRaider/internal/domain/manager"
 	"weakRaider/internal/domain/repository"
 	appLogger "weakRaider/internal/logger"
 )
@@ -21,6 +27,20 @@ type App struct {
 	Repository struct {
 		Season *repository.SeasonRepository
 	}
+
+	Client struct {
+		Blizzard  *blizzard.ClientWithResponses
+		BattleNet *blizzard.ClientWithResponses
+		WowAudit  *wowaudit.ClientWithResponses
+		Logs      *warcraftlogs.ClientWithResponses
+	}
+
+	Manager struct {
+		Auth       *manager.AuthManager
+		SeasonSync *manager.SeasonSync
+	}
+
+	Keys *clients.ApiKeys
 }
 
 func New() *App {
@@ -53,11 +73,56 @@ func (app *App) Initialize() error {
 		return fmt.Errorf("configure Gorm error: %v", err)
 	}
 
+	if err = app.configureClients(); err != nil {
+		return fmt.Errorf("configure Clients error: %v", err)
+	}
+
+	app.configureManagers()
+
 	return nil
 }
 
+func (app *App) configureClients() error {
+	hc := http.Client{}
+	var err error
+
+	if app.Client.Blizzard, err = blizzard.NewClientWithResponses(blizzard.ServerUrlHttpseuApiBlizzardCom, blizzard.WithHTTPClient(&hc)); err != nil {
+		return err
+	}
+
+	if app.Client.BattleNet, err = blizzard.NewClientWithResponses(blizzard.ServerUrlHttpsoauthBattleNet, blizzard.WithHTTPClient(&hc)); err != nil {
+		return err
+	}
+
+	if app.Client.WowAudit, err = wowaudit.NewClientWithResponses(wowaudit.ServerUrlHttpswowauditCom, wowaudit.WithHTTPClient(&hc)); err != nil {
+		return err
+	}
+
+	if app.Client.Logs, err = warcraftlogs.NewClientWithResponses(warcraftlogs.ServerUrlHttpswwwWarcraftlogsCom, warcraftlogs.WithHTTPClient(&hc)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (app *App) configureManagers() {
+	app.Manager.Auth = manager.NewAuthManager(
+		app.Config,
+		app.Client.BattleNet,
+		app.Client.Logs,
+		app.Keys,
+	)
+	app.Manager.SeasonSync = manager.NewSeasonSync(
+		app.Repository.Season,
+		app.Client.Blizzard,
+		app.Manager.Auth,
+	)
+}
+
 func (app *App) configureGorm() (*gorm.DB, error) {
-	gormConfig := &gorm.Config{}
+	gormConfig := &gorm.Config{
+		DisableAutomaticPing: true,
+	}
 
 	conn := postgres.New(postgres.Config{
 		DSN: fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",

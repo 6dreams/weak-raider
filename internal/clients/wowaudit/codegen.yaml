@@ -1,7 +1,9 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
 package: wowaudit
 generate:
   client: true
   models: true
+  server-urls: true
 output: internal/clients/wowaudit/client.gen.go
 output-options:
   skip-prune: true
