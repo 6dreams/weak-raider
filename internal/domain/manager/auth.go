@@ -25,6 +25,7 @@ func NewAuthManager(config *config.Config, blizzard *blizzard.ClientWithResponse
 	}
 }
 
+// BlizzardKey Возвращает ключ для API Blizzard, который сразу можно использовать в заголовке авторизации
 func (a *AuthManager) BlizzardKey() (string, error) {
 	if a.keys.Blizzard == nil {
 		resp, err := a.blizzard.AuthorizeWithFormdataBodyWithResponse(
@@ -44,7 +45,8 @@ func (a *AuthManager) BlizzardKey() (string, error) {
 			return "", err
 		}
 
-		a.keys.Blizzard = &resp.JSON200.AccessToken
+		key := fmt.Sprintf("Bearer %s", resp.JSON200.AccessToken)
+		a.keys.Blizzard = &key
 	}
 
 	return *a.keys.Blizzard, nil

@@ -39,6 +39,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEIndexResponse'
 
+  /data/wow/journal-expansion/{expansion_id}?locale=en_US:
+    get:
+      operationId: journalExpansionById
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/ExpansionId'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EJSeasonResponse'
+
   /profile/wow/character/{realm}/{character}/equipment?locale=en_US:
     get:
       operationId: equipment
@@ -85,6 +100,13 @@ components:
     Character:
       name: character
       description: Character to query
+      required: true
+      schema:
+        type: string
+      in: path
+    ExpansionId:
+      name: expansion_id
+      description: Идентификатор дополнения
       required: true
       schema:
         type: string
@@ -227,4 +249,37 @@ components:
               id:
                 type: integer
                 description: Идентификатор дополнения
-                example: 74
+
+    EJSeasonInstance:
+      type: array
+      items:
+        type: object
+        required:
+          - name
+          - id
+        properties:
+          name:
+            type: string
+            description: Название подземелья
+            example: Khaz Algar
+          id:
+            type: integer
+            description: Идентификатор рейда
+
+    EJSeasonResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          description: Идентификатор дополнения
+        name:
+          type: string
+          description: Название дополнения
+          example: Current Season
+        dungeons:
+          $ref: '#/components/schemas/EJSeasonInstance'
+        raids:
+          $ref: '#/components/schemas/EJSeasonInstance'

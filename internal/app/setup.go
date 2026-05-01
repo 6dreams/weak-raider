@@ -25,7 +25,8 @@ type App struct {
 	db *gorm.DB
 
 	Repository struct {
-		Season *repository.SeasonRepository
+		Season   *repository.SeasonRepository
+		Instance *repository.InstanceRepository
 	}
 
 	Client struct {
@@ -114,6 +115,7 @@ func (app *App) configureManagers() {
 	)
 	app.Manager.SeasonSync = manager.NewSeasonSync(
 		app.Repository.Season,
+		app.Repository.Instance,
 		app.Client.Blizzard,
 		app.Manager.Auth,
 	)
@@ -155,6 +157,7 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 
 	// repositories
 	app.Repository.Season = repository.NewSeasonRepository(app.db)
+	app.Repository.Instance = repository.NewInstanceRepository(app.db)
 
 	return db, nil
 }
