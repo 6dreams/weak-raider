@@ -1,0 +1,31 @@
+### Авторизация
+POST https://www.warcraftlogs.com/oauth/token
+Authorization: Basic {{warcraftlogs_client}} {{warcraftlogs_secret}}
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+
+> {% client.global.set("warcraftlogs_access_token", response.body.access_token); %}
+
+### Получение данных о репортах гильдии
+POST https://www.warcraftlogs.com/api/v2/client
+Content-Type: application/json
+Authorization: Bearer {{warcraftlogs_access_token}}
+
+{"query":"{ reportData { reports( guildID: 600147, limit: 15, page: 1 ) { data { code title startTime endTime zone { id name } } } } }"}
+
+### Получение данных о игроках в репорте
+POST https://www.warcraftlogs.com/api/v2/client
+Content-Type: application/json
+Authorization: Bearer {{warcraftlogs_access_token}}
+
+{"query":"{ reportData { report(code: \"fb9AcBJGvNPMwTtd\") { fights { id encounterID name startTime endTime kill difficulty friendlyPlayers } events(dataType: CombatantInfo, startTime: 0, endTime: 9999999999) { data } } } }"}
+
+### Получение ранков по классу-спеку.
+POST https://www.warcraftlogs.com/api/v2/client
+Content-Type: application/json
+Authorization: Bearer {{warcraftlogs_access_token}}
+
+{"query":"{ worldData { encounter(id: 3176) { id name characterRankings( metric: dps difficulty: 5 includeCombatantInfo: true className: \"Hunter\" specName: \"BeastMastery\" page: 1) } } }"}
+
+

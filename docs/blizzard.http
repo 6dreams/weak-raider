@@ -29,3 +29,29 @@ GET https://eu.api.blizzard.com/data/wow/item/249997?namespace=static-12.0.1_656
 Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}
 Accept: application/json
+
+### Journal: Index
+GET https://eu.api.blizzard.com/data/wow/journal-expansion/index?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Journal: Current Season
+GET https://eu.api.blizzard.com/data/wow/journal-expansion/505?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+
+### Journal: Current Season - Keystone Dungeons
+GET https://eu.api.blizzard.com/data/wow/journal-instance/278?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Journal: Current Season - Pit of Saron
+GET https://eu.api.blizzard.com/data/wow/journal-encounter/609?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+
+### Item: Rimewoven Silks
+GET https://eu.api.blizzard.com/data/wow/item/133504?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}

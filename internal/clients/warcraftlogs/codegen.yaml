@@ -1,0 +1,7 @@
+package: warcraftlogs
+generate:
+  client: true
+  models: true
+output: internal/clients/warcraftlogs/client.gen.go
+output-options:
+  skip-prune: true
