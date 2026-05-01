@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS guild(
 
 CREATE TABLE IF NOT EXISTS "character" (
   id BIGSERIAL PRIMARY KEY,
-  blizzard_id BIGINT NOT NULL,
   class text NOT NULL,
   name text NOT NULL,
   note text DEFAULT '',
