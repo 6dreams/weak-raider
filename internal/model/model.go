@@ -10,17 +10,16 @@ type Guild struct {
 }
 
 type Character struct {
-	Id        int       `db:"character_id"`
-	Name      string    `db:"name"`
-	Class     string    `db:"class"`
-	Rank      string    `db:"rank"`
-	Role      string    `db:"role"`
-	Realm     string    `db:"realm"`
-	Note      string    `db:"note"`
-	GuildId   int       `db:"guild_id"`
-	UpdatedAt time.Time `db:"updated_at"`
-
-	// todo: wowaudit update time
+	Id                int       `db:"character_id"`
+	Name              string    `db:"name"`
+	Class             string    `db:"class"`
+	Rank              string    `db:"rank"`
+	Role              string    `db:"role"`
+	Realm             string    `db:"realm"`
+	Note              string    `db:"note"`
+	GuildId           int       `db:"guild_id"`
+	UpdatedAt         time.Time `db:"updated_at"`
+	WowauditUpdatedAt time.Time `db:"wowaudit_updated_at"`
 }
 
 type Season struct {
