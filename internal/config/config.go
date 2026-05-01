@@ -1,9 +1,10 @@
 package config
 
 import (
+	"time"
+
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
-	"time"
 )
 
 // Build information -ldflags .
@@ -37,6 +38,7 @@ type Project struct {
 	Debug       bool   `yaml:"debug"`
 	Name        string `yaml:"name"`
 	Environment string `yaml:"environment"`
+	Port        string `yaml:"port"`
 	Version     string
 	CommitHash  string
 }
