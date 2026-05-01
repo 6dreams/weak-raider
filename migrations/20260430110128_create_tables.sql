@@ -3,19 +3,23 @@ CREATE TABLE IF NOT EXISTS guild(
   id BIGSERIAL PRIMARY KEY,
   name text NOT NULL,
   wowaudit_key TEXT NOT NULL,
-  updated TIMESTAMP
+  updated_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS champion (
+CREATE TABLE IF NOT EXISTS "character" (
   id BIGSERIAL PRIMARY KEY,
-  name text NOT NULL,
-  class text NOT NULL,
-  realm text NOT NULL,
-  note text DEFAULT '',
-  guild_id BIGINT,
   blizzard_id BIGINT NOT NULL,
-  updated TIMESTAMP,
+  class text NOT NULL,
+  name text NOT NULL,
+  note text DEFAULT '',
+  rank text NOT NULL,
+  realm text NOT NULL,
+  role text NOT NULL,
+  guild_id BIGINT,
+  updated_at TIMESTAMP,
   FOREIGN KEY (guild_id) REFERENCES guild(id)
 );
 -- +goose Down
-SELECT 'DROP TABLE IF EXISTS guild';
+DROP TABLE IF EXISTS character;
+DROP TABLE IF EXISTS guild;
+
