@@ -3,10 +3,17 @@ package entity
 import "database/sql"
 
 type Season struct {
-	ID         int           `gorm:"primary_key;column:id;type:bigserial;not null"`
+	// Идентификатор сезона, генерируется автоматически.
+	ID int `gorm:"primary_key;column:id;type:bigserial;not null"`
+
+	// Идентификатор сезона по Blizzard, берётся из API Blizzard.
 	BlizzardId sql.NullInt64 `gorm:"column:blizzard_id;type:bigint;null"`
-	WowAuditId sql.NullInt64 `gorm:"column:woow_audit_id;type:bigint;null"`
-	Name       string        `gorm:"column:name;type:text;not null"`
+
+	// Идентификатор сезона по WoW Audit, берётся из API WoW Audit.
+	WowAuditId sql.NullInt64 `gorm:"column:wow_audit_id;type:bigint;null"`
+
+	// Название сезона.
+	Name string `gorm:"column:name;type:text;not null"`
 }
 
 func (s Season) TableName() string {

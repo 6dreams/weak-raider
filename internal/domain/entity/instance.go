@@ -4,7 +4,7 @@ import "time"
 
 type Instance struct {
 	// Идентификатор подземелья, берётся из API Blizzard.
-	Id int `gorm:"primary_key;column:id;type:bigint;not null"`
+	ID int `gorm:"primary_key;column:id;type:bigint;not null"`
 
 	// Связь с сезоном.
 	SeasonId int
@@ -16,6 +16,6 @@ type Instance struct {
 	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now()"`
 }
 
-func (Instance) TableName() string {
+func (i Instance) TableName() string {
 	return "instance"
 }
