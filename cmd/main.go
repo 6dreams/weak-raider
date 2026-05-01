@@ -3,7 +3,11 @@ package main
 import (
 	"fmt"
 	"weakRaider/internal/config"
+	"weakRaider/internal/handlers"
 	myLogger "weakRaider/internal/logger"
+	"weakRaider/internal/repo"
+	"weakRaider/internal/server"
+	"weakRaider/internal/service"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -42,9 +46,17 @@ func main() {
 
 	sqlDB, err := db.DB()
 	logger.Debug().Msg("gorm connection succesfully created")
+
 	if err != nil {
 		logger.Fatal().Err(err).Msg("failed get sqlDB from gorm")
 	}
 	defer sqlDB.Close()
+
+	repo := repo.NewRepo(db)
+	service := service.NewService(repo, logger)
+	handlers := handlers.NewHandler(service)
+	server := server.NewServer(cfg.Project.Port, handlers.Handler())
+
+	server.Run()
 
 }
