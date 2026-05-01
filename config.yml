@@ -1,5 +1,6 @@
 project:
   name: Weak Raider
+  port: 8080
   debug: true
   environment: development
 
