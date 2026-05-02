@@ -91,7 +91,7 @@ func (s *SeasonSync) Sync() error {
 		strconv.Itoa(seasonId),
 		&blizzard.JournalExpansionByIdParams{
 			Authorization:      key,
-			BattlenetNamespace: blizzard.ServerUrlHttpseuApiBlizzardCom,
+			BattlenetNamespace: blizzard.JournalExpansionByIdParamsBattlenetNamespaceStaticEu,
 		},
 	)
 
