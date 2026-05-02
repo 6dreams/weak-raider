@@ -2,10 +2,6 @@ package app
 
 import (
 	"fmt"
-	"github.com/rs/zerolog"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	gormLogger "gorm.io/gorm/logger"
 	"net/http"
 	"time"
 	"weakRaider/internal/clients"
@@ -16,6 +12,11 @@ import (
 	"weakRaider/internal/domain/manager"
 	"weakRaider/internal/domain/repository"
 	appLogger "weakRaider/internal/logger"
+
+	"github.com/rs/zerolog"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
 )
 
 type App struct {
@@ -156,8 +157,8 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	}
 
 	// repositories
-	app.Repository.Season = repository.NewSeasonRepository(app.db)
-	app.Repository.Instance = repository.NewInstanceRepository(app.db)
+	app.Repository.Season = repository.NewSeasonRepository(db)
+	app.Repository.Instance = repository.NewInstanceRepository(db)
 
 	return db, nil
 }
