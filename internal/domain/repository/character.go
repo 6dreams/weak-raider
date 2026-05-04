@@ -27,11 +27,14 @@ func (c *CharacterRepository) Upsert(character *entity.Character) error {
 	return c.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&character).Error
 }
 
-func (c *CharacterRepository) FindAll() (entity.CharacterMap, error) {
+func (c *CharacterRepository) FindAll(guild *entity.Guild) (entity.CharacterMap, error) {
 	characters := []entity.Character{}
 	charMap := entity.CharacterMap{}
 
-	if err := c.db.Model(entity.Character{}).Find(&characters).Error; err != nil {
+	if err := c.db.Model(entity.Character{}).
+		Find(&characters).
+		Where("guild_id = ?", guild.ID).
+		Error; err != nil {
 		return nil, err
 	}
 

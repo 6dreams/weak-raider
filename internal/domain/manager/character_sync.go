@@ -19,8 +19,8 @@ func NewCharacterSync(
 	return &CharacterSync{characterRepo: characterRepo, wowAudit: wowAudit}
 }
 
-func (c *CharacterSync) Sync(guild entity.Guild) error {
-	characters, err := c.characterRepo.FindAll()
+func (c *CharacterSync) Sync(guild *entity.Guild) error {
+	characters, err := c.characterRepo.FindAll(guild) //может кэшировать персов? каждый раз выгружать эту гору персонажей из бд не перебор?
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (c *CharacterSync) Sync(guild entity.Guild) error {
 			Role:    v.Role,
 			Realm:   v.Realm,
 			GuildId: guild.ID,
-			Guild:   &guild,
+			Guild:   guild,
 		}
 
 		if v.Note != nil {
