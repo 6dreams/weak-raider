@@ -38,11 +38,10 @@ type DBCons struct {
 
 // Project - contains all parameters project information.
 type Project struct {
-	Debug       bool          `yaml:"debug"`
-	Name        string        `yaml:"name"`
-	Environment string        `yaml:"environment"`
-	Port        string        `yaml:"port"`
-	Tickrate    time.Duration `yaml:"tickrate"`
+	Debug       bool   `yaml:"debug"`
+	Name        string `yaml:"name"`
+	Environment string `yaml:"environment"`
+	Port        string `yaml:"port"`
 	Version     string
 	CommitHash  string
 }
@@ -58,10 +57,16 @@ type Secrets struct {
 	}
 }
 
+// Tickers - contains all tickrates for API's
+type Tickers struct {
+	WoWAudit time.Duration `yaml:"wowAudit"`
+}
+
 // Config - contains all configuration parameters in config package.
 type Config struct {
 	Project  Project  `yaml:"project"`
 	Database Database `yaml:"database"`
+	Tickers  Tickers  `yaml:"tickers"`
 	Auth     Secrets
 }
 

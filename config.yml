@@ -3,7 +3,6 @@ project:
   port: 8080
   debug: true
   environment: development
-  tickrate: 1h
 
 database:
   sslmode: disable
@@ -14,3 +13,6 @@ database:
     maxIdleCons: 5
     connMaxIdleTime: 5m
     connMaxLifeTime: 5m
+
+tickers:
+  wowAudit: 24h

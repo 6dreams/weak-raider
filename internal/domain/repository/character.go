@@ -31,11 +31,13 @@ func (c *CharacterRepository) FindAll(guild *entity.Guild) (entity.CharacterMap,
 	characters := []entity.Character{}
 	charMap := entity.CharacterMap{}
 
-	if err := c.db.Model(entity.Character{}).
+	result := c.db.
+		Model(entity.Character{}).
 		Find(&characters).
-		Where("guild_id = ?", guild.ID).
-		Error; err != nil {
-		return nil, err
+		Where("guild_id = ?", guild.ID)
+
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	for _, v := range characters {

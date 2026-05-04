@@ -5,6 +5,8 @@ import (
 	"weakRaider/internal/clients/wowaudit"
 	"weakRaider/internal/domain/entity"
 	"weakRaider/internal/domain/repository"
+
+	"github.com/rs/zerolog/log"
 )
 
 type CharacterSync struct {
@@ -20,7 +22,7 @@ func NewCharacterSync(
 }
 
 func (c *CharacterSync) Sync(guild *entity.Guild) error {
-	characters, err := c.characterRepo.FindAll(guild) //может кэшировать персов? каждый раз выгружать эту гору персонажей из бд не перебор?
+	characters, err := c.characterRepo.FindAll(guild)
 	if err != nil {
 		return err
 	}
@@ -54,13 +56,13 @@ func (c *CharacterSync) Sync(guild *entity.Guild) error {
 
 		if !ok {
 			if err := c.characterRepo.Create(character); err != nil {
-				return err
+				log.Err(err).Msgf("failed create new character: %v", character.Name+" "+character.Realm)
 			}
 			continue
 		}
 
 		if err := c.characterRepo.Update(character); err != nil {
-			return err
+			log.Err(err).Msgf("failed update character: %v", character.Name+" "+character.Realm)
 		}
 	}
 	return nil

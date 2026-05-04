@@ -59,11 +59,11 @@ func (app *App) Run() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	ticker := time.Tick(app.Config.Project.Tickrate)
+	wowAuditTicker := time.Tick(app.Config.Tickers.WoWAudit)
 
 	for {
 		select {
-		case <-ticker:
+		case <-wowAuditTicker:
 			guilds, err := app.Repository.Guild.FindAll()
 			if err != nil {
 				app.Logger.Err(err).Msg("failed Guild.Findall() in app.Run")
@@ -75,6 +75,7 @@ func (app *App) Run() {
 			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
 
 		case <-ctx.Done():
+			return
 			//shutdown sequence
 		}
 
