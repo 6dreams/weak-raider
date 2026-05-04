@@ -15,7 +15,7 @@ func NewGuildRepository(db *gorm.DB) *GuildRepository {
 }
 
 func (c *GuildRepository) Create(guild *entity.Guild) error {
-	return c.db.Model(entity.Character{}).Create(guild).Error
+	return c.db.Model(entity.Guild{}).Create(guild).Error
 }
 
 func (c *GuildRepository) FindAll() ([]entity.Guild, error) {
