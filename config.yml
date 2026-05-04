@@ -3,6 +3,7 @@ project:
   port: 8080
   debug: true
   environment: development
+  tickrate: 1h
 
 database:
   sslmode: disable

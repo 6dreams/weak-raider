@@ -1,8 +1,11 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 	"weakRaider/internal/clients"
 	"weakRaider/internal/clients/blizzard"
@@ -29,6 +32,7 @@ type App struct {
 		Season    *repository.SeasonRepository
 		Instance  *repository.InstanceRepository
 		Character *repository.CharacterRepository
+		Guild     *repository.GuildRepository
 	}
 
 	Client struct {
@@ -52,7 +56,29 @@ func New() *App {
 }
 
 func (app *App) Run() {
-	// do job.
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	ticker := time.Tick(app.Config.Project.Tickrate)
+
+	for {
+		select {
+		case <-ticker:
+			guilds, err := app.Repository.Guild.FindAll()
+			if err != nil {
+				app.Logger.Err(err).Msg("failed Guild.Findall() in app.Run")
+				continue
+			}
+			for _, v := range guilds {
+				app.Manager.CharacterSync.Sync(&v)
+			}
+			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
+
+		case <-ctx.Done():
+			//shutdown sequence
+		}
+
+	}
 }
 
 func (app *App) Database() *gorm.DB {
@@ -166,6 +192,7 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	app.Repository.Season = repository.NewSeasonRepository(db)
 	app.Repository.Instance = repository.NewInstanceRepository(db)
 	app.Repository.Character = repository.NewCharacterRepository(db)
+	app.Repository.Guild = repository.NewGuildRepository(db)
 
 	return db, nil
 }
