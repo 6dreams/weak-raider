@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+type CharacterMap = map[string]Character
+
 type Character struct {
 	// Идентификатор персонажа, генерируется автоматически.
 	ID int `gorm:"primary_key;column:id;type:bigserial;not null"`

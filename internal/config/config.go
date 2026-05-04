@@ -57,10 +57,16 @@ type Secrets struct {
 	}
 }
 
+// Tickers - contains all tickrates for API's
+type Tickers struct {
+	WoWAudit time.Duration `yaml:"wowAudit"`
+}
+
 // Config - contains all configuration parameters in config package.
 type Config struct {
 	Project  Project  `yaml:"project"`
 	Database Database `yaml:"database"`
+	Tickers  Tickers  `yaml:"tickers"`
 	Auth     Secrets
 }
 

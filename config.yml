@@ -13,3 +13,6 @@ database:
     maxIdleCons: 5
     connMaxIdleTime: 5m
     connMaxLifeTime: 5m
+
+tickers:
+  wowAudit: 24h

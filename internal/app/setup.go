@@ -1,8 +1,11 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 	"weakRaider/internal/clients"
 	"weakRaider/internal/clients/blizzard"
@@ -26,8 +29,10 @@ type App struct {
 	db *gorm.DB
 
 	Repository struct {
-		Season   *repository.SeasonRepository
-		Instance *repository.InstanceRepository
+		Season    *repository.SeasonRepository
+		Instance  *repository.InstanceRepository
+		Character *repository.CharacterRepository
+		Guild     *repository.GuildRepository
 	}
 
 	Client struct {
@@ -38,8 +43,9 @@ type App struct {
 	}
 
 	Manager struct {
-		Auth       *manager.AuthManager
-		SeasonSync *manager.SeasonSync
+		Auth          *manager.AuthManager
+		SeasonSync    *manager.SeasonSync
+		CharacterSync *manager.CharacterSync
 	}
 
 	Keys *clients.ApiKeys
@@ -50,7 +56,30 @@ func New() *App {
 }
 
 func (app *App) Run() {
-	// do job.
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	wowAuditTicker := time.Tick(app.Config.Tickers.WoWAudit)
+
+	for {
+		select {
+		case <-wowAuditTicker:
+			guilds, err := app.Repository.Guild.FindAll()
+			if err != nil {
+				app.Logger.Err(err).Msg("failed Guild.Findall() in app.Run")
+				continue
+			}
+			for _, v := range guilds {
+				app.Manager.CharacterSync.Sync(&v)
+			}
+			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
+
+		case <-ctx.Done():
+			return
+			//shutdown sequence
+		}
+
+	}
 }
 
 func (app *App) Database() *gorm.DB {
@@ -120,6 +149,10 @@ func (app *App) configureManagers() {
 		app.Client.Blizzard,
 		app.Manager.Auth,
 	)
+	app.Manager.CharacterSync = manager.NewCharacterSync(
+		app.Repository.Character,
+		app.Client.WowAudit,
+	)
 }
 
 func (app *App) configureGorm() (*gorm.DB, error) {
@@ -159,6 +192,8 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	// repositories
 	app.Repository.Season = repository.NewSeasonRepository(db)
 	app.Repository.Instance = repository.NewInstanceRepository(db)
+	app.Repository.Character = repository.NewCharacterRepository(db)
+	app.Repository.Guild = repository.NewGuildRepository(db)
 
 	return db, nil
 }
