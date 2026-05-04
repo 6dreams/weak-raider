@@ -26,8 +26,9 @@ type App struct {
 	db *gorm.DB
 
 	Repository struct {
-		Season   *repository.SeasonRepository
-		Instance *repository.InstanceRepository
+		Season    *repository.SeasonRepository
+		Instance  *repository.InstanceRepository
+		Character *repository.CharacterRepository
 	}
 
 	Client struct {
@@ -38,8 +39,9 @@ type App struct {
 	}
 
 	Manager struct {
-		Auth       *manager.AuthManager
-		SeasonSync *manager.SeasonSync
+		Auth          *manager.AuthManager
+		SeasonSync    *manager.SeasonSync
+		CharacterSync *manager.CharacterSync
 	}
 
 	Keys *clients.ApiKeys
@@ -120,6 +122,10 @@ func (app *App) configureManagers() {
 		app.Client.Blizzard,
 		app.Manager.Auth,
 	)
+	app.Manager.CharacterSync = manager.NewCharacterSync(
+		app.Repository.Character,
+		app.Client.WowAudit,
+	)
 }
 
 func (app *App) configureGorm() (*gorm.DB, error) {
@@ -159,6 +165,7 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	// repositories
 	app.Repository.Season = repository.NewSeasonRepository(db)
 	app.Repository.Instance = repository.NewInstanceRepository(db)
+	app.Repository.Character = repository.NewCharacterRepository(db)
 
 	return db, nil
 }
