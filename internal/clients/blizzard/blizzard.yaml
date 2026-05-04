@@ -70,6 +70,20 @@ paths:
                 $ref: '#/components/schemas/ProfileEquipmentResponse'
           description: Players equipment
 
+  /data/wow/talent-tree/index?locale=en_US:
+    get:
+      operationId: getTalentTrees
+      parameters: 
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/Authorization' 
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalentTreeIndexResponse'
+          description: In-game talents
+
 components:
   parameters:
     Authorization:
@@ -283,3 +297,40 @@ components:
           $ref: '#/components/schemas/EJSeasonInstance'
         raids:
           $ref: '#/components/schemas/EJSeasonInstance'
+
+    TalentTreeIndexResponse:
+      type: object
+      required: 
+        - spec_talent_trees
+        - class_talent_trees
+        - hero_talent_trees
+      properties: 
+        spec_talent_trees: 
+          $ref: '#/components/schemas/TalentTreeInstance'
+        class_talent_trees:
+          $ref: '#/components/schemas/TalentTreeInstance'
+        hero_talent_trees:
+          $ref: '#/components/schemas/TalentTreeInstance'
+
+
+
+    TalentTreeInstance:
+      type: array
+      items: 
+        type: object
+        required:
+          - key
+          - name
+        properties:
+          key:
+            type: object
+            required: 
+              - href
+            properties:
+              href:
+                type: string
+                description: Ссылка на древо талантов
+          name:
+            type: string
+            description: Имя древа талантов
+
