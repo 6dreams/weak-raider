@@ -38,10 +38,11 @@ type DBCons struct {
 
 // Project - contains all parameters project information.
 type Project struct {
-	Debug       bool   `yaml:"debug"`
-	Name        string `yaml:"name"`
-	Environment string `yaml:"environment"`
-	Port        string `yaml:"port"`
+	Debug       bool          `yaml:"debug"`
+	Name        string        `yaml:"name"`
+	Environment string        `yaml:"environment"`
+	Port        string        `yaml:"port"`
+	Tickrate    time.Duration `yaml:"tickrate"`
 	Version     string
 	CommitHash  string
 }
