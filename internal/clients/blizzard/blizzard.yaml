@@ -72,7 +72,7 @@ paths:
 
   /data/wow/talent-tree/index?locale=en_US:
     get:
-      operationId: getTalentTrees
+      operationId: GetTalentTrees
       parameters: 
         - $ref: '#/components/parameters/Namespace'
         - $ref: '#/components/parameters/Authorization' 
@@ -82,7 +82,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TalentTreeIndexResponse'
-          description: In-game talents
+          description: Get talent trees
+
+  /data/wow/talent-tree/{talentTreeId}/playable-specialization/{specId}?locale=en_US:
+    get:
+      operationId: GetTalents
+      parameters:
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/TalentTreeId'
+        - $ref: '#/components/parameters/SpecId'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalentsResponse'
+          description: Get Talents lists
+
 
 components:
   parameters:
@@ -121,6 +138,20 @@ components:
     ExpansionId:
       name: expansion_id
       description: Идентификатор дополнения
+      required: true
+      schema:
+        type: string
+      in: path
+    TalentTreeId:
+      name: talentTreeId
+      description: talent tree id for query
+      required: true
+      schema:
+        type: string
+      in: path
+    SpecId:
+      name: specId
+      description: specialisation tree id for query
       required: true
       schema:
         type: string
@@ -312,8 +343,6 @@ components:
         hero_talent_trees:
           $ref: '#/components/schemas/TalentTreeInstance'
 
-
-
     TalentTreeInstance:
       type: array
       items: 
@@ -334,3 +363,159 @@ components:
             type: string
             description: Имя древа талантов
 
+    TalentsResponse:
+      type: object
+      required:
+      - id
+      - playable_class
+      - playable_specialization
+      - name
+      - class_talent_nodes
+      - spec_talent_nodes
+      - hero_talent_trees
+      properties:
+        id:
+          type: integer
+        playable_class:
+          $ref: '#/components/schemas/playable_talent_set'
+        playable_specialization:
+          $ref: '#/components/schemas/playable_talent_set'
+        name:
+          type: string
+        class_talent_nodes:
+          $ref: '#/components/schemas/talent_nodes_set'
+        spec_talent_nodes:
+          $ref: '#/components/schemas/talent_nodes_set'
+        hero_talent_trees:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              hero_talent_nodes:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    node_type:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        type:
+                          type: string
+                      required:
+                        - id
+                        - type
+                    ranks:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          rank:
+                            type: integer
+                        required:
+                          - rank
+                    display_row:
+                      type: integer
+                    display_col:
+                      type: integer
+                    raw_position_x:
+                      type: integer
+                    raw_position_y:
+                      type: integer
+                  required:
+                    - id
+                    - node_type
+                    - ranks
+                    - display_row
+                    - display_col
+                    - raw_position_x
+                    - raw_position_y
+              playable_class:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  id:
+                    type: integer
+                required:
+                  - name
+                  - id
+              playable_specializations:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    id:
+                      type: integer
+                  required:
+                    - name
+                    - id
+            required:
+              - id
+              - name
+              - hero_talent_nodes
+              - playable_class
+              - playable_specializations
+
+    talent_nodes_set:
+      type: array
+      items:
+        type: object
+        required:
+          - id
+          - node_type
+          - ranks
+          - display_row
+          - display_col
+          - raw_position_x
+          - raw_position_y
+        properties:
+          id:
+            type: integer
+          node_type:
+            type: object
+            required:
+              - id
+              - type
+            properties:
+              id:
+                type: integer
+              type:
+                type: string
+          ranks:
+            type: array
+            items:
+              type: object
+              required:
+                - rank
+              properties:
+                rank:
+                  type: integer
+          display_row:
+            type: integer
+          display_col:
+            type: integer
+          raw_position_x:
+            type: integer
+          raw_position_y:
+            type: integer
+            
+    playable_talent_set:
+      type: object
+      required:
+        - name
+        - id
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
