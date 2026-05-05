@@ -88,6 +88,7 @@ paths:
   /data/wow/talent-tree/index?locale=en_US:
     get:
       operationId: GetTalentTrees
+      operationId: GetTalentTrees
       parameters: 
         - $ref: '#/components/parameters/Namespace'
         - $ref: '#/components/parameters/Authorization' 
@@ -97,6 +98,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TalentTreeIndexResponse'
+          description: Get talent trees
+
+  /data/wow/talent-tree/{talentTreeId}/playable-specialization/{specId}?locale=en_US:
+    get:
+      operationId: GetTalents
+      parameters:
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/TalentTreeId'
+        - $ref: '#/components/parameters/SpecId'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TalentsResponse'
+          description: Get Talents lists
+
           description: Get talent trees
 
   /data/wow/talent-tree/{talentTreeId}/playable-specialization/{specId}?locale=en_US:
@@ -153,6 +172,20 @@ components:
     ExpansionId:
       name: expansion_id
       description: Идентификатор дополнения
+      required: true
+      schema:
+        type: string
+      in: path
+    TalentTreeId:
+      name: talentTreeId
+      description: talent tree id for query
+      required: true
+      schema:
+        type: string
+      in: path
+    SpecId:
+      name: specId
+      description: specialisation tree id for query
       required: true
       schema:
         type: string
