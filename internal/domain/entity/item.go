@@ -2,7 +2,7 @@ package entity
 
 type Item struct {
 	// Идентификатор предмета, берётся из API Blizzard.
-	ID int `gorm:"primary_key;column:id;type:bigserial;not null"` // ign id
+	ID int `gorm:"primary_key;column:id;type:bigint;primaryKey;autoIncrement;not null"` // ign id
 
 	// Характеристики предмета.
 

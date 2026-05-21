@@ -2,6 +2,7 @@ package manager
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"weakRaider/internal/clients"
 	"weakRaider/internal/clients/blizzard"
@@ -32,16 +33,20 @@ func (a *AuthManager) BlizzardKey() (string, error) {
 			context.TODO(),
 			&blizzard.AuthorizeParams{
 				Authorization: fmt.Sprintf(
-					"Basic %s %s",
-					a.config.Auth.Blizzard.Client,
-					a.config.Auth.Blizzard.Secret),
+					"Basic %s",
+					base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf(
+						"%s:%s",
+						a.config.Auth.Blizzard.Client,
+						a.config.Auth.Blizzard.Secret,
+					))),
+				),
 			},
 			blizzard.AuthorizeFormdataRequestBody{
 				GrantType: "client_credentials",
 			},
 		)
 
-		if err != nil || resp.JSON200 != nil {
+		if err != nil || resp.JSON200 == nil {
 			return "", err
 		}
 

@@ -2,34 +2,76 @@ package manager
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"strconv"
+	"time"
 	"weakRaider/internal/clients/blizzard"
+	"weakRaider/internal/clients/raidbots"
+	"weakRaider/internal/clients/wowaudit"
+	"weakRaider/internal/config"
 	"weakRaider/internal/domain/entity"
 	"weakRaider/internal/domain/repository"
 )
 
 var ErrInvalidApiResponse = errors.New("invalid api response, empty or non-parsable body")
+var ErrNothingNoUpdate = errors.New("nothing to update")
 
 type SeasonSync struct {
+	config       *config.Config
 	seasonRepo   *repository.SeasonRepository
 	instanceRepo *repository.InstanceRepository
 	blizzard     *blizzard.ClientWithResponses
+	wowaudit     *wowaudit.ClientWithResponses
+	raidBots     *raidbots.ClientWithResponses
 	authManager  *AuthManager
 }
 
 func NewSeasonSync(
+	config *config.Config,
 	seasonRepo *repository.SeasonRepository,
 	instanceRepo *repository.InstanceRepository,
 	blizzard *blizzard.ClientWithResponses,
+	wowaudit *wowaudit.ClientWithResponses,
+	raidBots *raidbots.ClientWithResponses,
 	auth *AuthManager,
 ) *SeasonSync {
 	return &SeasonSync{
+		config:       config,
 		seasonRepo:   seasonRepo,
 		instanceRepo: instanceRepo,
 		blizzard:     blizzard,
+		wowaudit:     wowaudit,
+		raidBots:     raidBots,
 		authManager:  auth,
 	}
+}
+
+func getCurrentSeason(seasons *entity.SeasonMap) *entity.Season {
+	for _, season := range *seasons {
+		if season.IsCurrent {
+			return &season
+		}
+	}
+
+	return nil
+}
+
+func (s *SeasonSync) SyncInstances() error {
+	instances, err := s.instanceRepo.FindWithInstances()
+	if err != nil {
+		return err
+	}
+
+	if len(instances) == 0 {
+		return ErrNothingNoUpdate
+	}
+
+	//for _, instance := range instances {
+	//
+	//}
+
+	return nil
 }
 
 func (s *SeasonSync) Sync() error {
@@ -41,6 +83,11 @@ func (s *SeasonSync) Sync() error {
 	instances, err := s.instanceRepo.FindAll()
 	if err != nil {
 		return err
+	}
+
+	currentSeason := getCurrentSeason(&seasons)
+	if currentSeason != nil && s.isSeasonUpdateRequired(currentSeason) && !isWowAuditRequired(currentSeason) && len(instances) > 0 {
+		return nil
 	}
 
 	key, err := s.authManager.BlizzardKey()
@@ -75,15 +122,61 @@ func (s *SeasonSync) Sync() error {
 	}
 
 	season, ok := seasons[seasonId]
+	updateSeason := false
+
 	if !ok {
-		season := &entity.Season{
+		season = entity.Season{
 			BlizzardId: seasonId,
 			Name:       season.Name,
+			IsCurrent:  true,
 		}
 
-		if err := s.seasonRepo.Upsert(season); err != nil {
+		updateSeason = true
+	}
+
+	currentWasChanged := false
+	if !season.IsCurrent {
+		season.IsCurrent = true
+		updateSeason = true
+		currentWasChanged = true
+	}
+
+	if isWowAuditRequired(&season) {
+		audit, err := s.wowaudit.GetPeriodWithResponse(context.TODO(), &wowaudit.GetPeriodParams{
+			Authorization: s.config.Auth.WowAudit,
+		})
+
+		if err == nil && audit.JSON200 != nil {
+			season.Name = audit.JSON200.CurrentSeason.Name
+			season.WowAuditId = sql.NullInt64{
+				Int64: int64(audit.JSON200.CurrentSeason.Id),
+				Valid: true,
+			}
+			updateSeason = true
+		}
+	}
+
+	if updateSeason {
+		if err := s.seasonRepo.Update(&season); err != nil {
 			return err
 		}
+	}
+
+	for _, seasonTemp := range seasons {
+		if seasonTemp.IsCurrent && season.ID != seasonTemp.ID {
+			seasonTemp.IsCurrent = false
+			// ignore errors
+			_ = s.seasonRepo.Update(&season)
+		}
+	}
+
+	if !s.isSeasonUpdateRequired(&season) && !currentWasChanged && len(instances) > 0 {
+		return nil
+	}
+
+	validInstanceIds, err := s.getSeasonInstances()
+	if err != nil {
+		return err
 	}
 
 	apiInstances, err := s.blizzard.JournalExpansionByIdWithResponse(
@@ -102,21 +195,22 @@ func (s *SeasonSync) Sync() error {
 		return ErrInvalidApiResponse
 	}
 
-	s.storeInstances(&instances, &season, apiInstances.JSON200.Dungeons, false)
-	s.storeInstances(&instances, &season, apiInstances.JSON200.Raids, true)
+	s.storeInstances(validInstanceIds, &instances, &season, apiInstances.JSON200.Dungeons, false)
+	s.storeInstances(validInstanceIds, &instances, &season, apiInstances.JSON200.Raids, true)
 
 	return nil
 }
 
-func (s *SeasonSync) storeInstances(instances *entity.InstanceMap, season *entity.Season, api *blizzard.EJSeasonInstance, isRaid bool) {
+func (s *SeasonSync) storeInstances(validInstances map[int]bool, instances *entity.InstanceMap, season *entity.Season, api *blizzard.EJSeasonInstance, isRaid bool) {
 	if api == nil {
 		return
 	}
 
 	for _, apiInstance := range *api {
-		instance, ok := (*instances)[apiInstance.Id]
+		instance, exists := (*instances)[apiInstance.Id]
+		_, valid := validInstances[apiInstance.Id]
 
-		if !ok {
+		if !exists && valid {
 			instance = entity.Instance{
 				ID:       apiInstance.Id,
 				Name:     apiInstance.Name,
@@ -130,4 +224,42 @@ func (s *SeasonSync) storeInstances(instances *entity.InstanceMap, season *entit
 			}
 		}
 	}
+}
+
+func isWowAuditRequired(season *entity.Season) bool {
+	return !season.WowAuditId.Valid || "" == season.Name
+}
+
+func (s *SeasonSync) isSeasonUpdateRequired(season *entity.Season) bool {
+	return !season.UpdatedAt.Add(s.config.Tickers.SyncSeasons).After(time.Now())
+}
+
+func (s *SeasonSync) getSeasonInstances() (map[int]bool, error) {
+	instances := make(map[int]bool, 0)
+
+	data, err := s.raidBots.GetInstancesWithResponse(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	if data.JSON200 == nil {
+		return nil, ErrInvalidApiResponse
+	}
+
+	for _, instance := range *data.JSON200 {
+		// Mythic Plus Dungeons.
+		// У них есть вменяемый тип.
+		if instance.Type == "mplus-chest" {
+			for _, encounter := range instance.Encounters {
+				instances[encounter.Id] = true
+			}
+		}
+
+		// Рейды, у них есть тип, но с этим же типом есть сомнительные группы.
+		if instance.Id > 0 && instance.Type == "raid" {
+			instances[instance.Id] = true
+		}
+	}
+
+	return instances, nil
 }

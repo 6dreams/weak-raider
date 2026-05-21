@@ -39,6 +39,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEIndexResponse'
 
+  /data/wow/journal-instance/{instance_id}?locale=en_US:
+    get:
+      operationId: journalInstance
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/InstanceId'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JEInstanceResponse'
+
   /data/wow/journal-expansion/{expansion_id}?locale=en_US:
     get:
       operationId: journalExpansionById
@@ -107,6 +122,13 @@ components:
     ExpansionId:
       name: expansion_id
       description: Идентификатор дополнения
+      required: true
+      schema:
+        type: string
+      in: path
+    InstanceId:
+      name: instance_id
+      description: Идентификатор подземелья
       required: true
       schema:
         type: string
@@ -227,6 +249,32 @@ components:
               enchantment_id:
                 type: integer
                 description: Internal ID
+
+    Translation:
+      type: object
+      additionalProperties:
+        type: string
+
+
+    JEInstanceResponse:
+      type: object
+      required:
+        - name
+        - encounters
+      properties:
+        name:
+          $ref: "#/components/schemas/Translation"
+        encounters:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+              description: Идентификатор босса подземелья.
+            name:
+              $ref: '#/components/schemas/Translation'
 
     JEIndexResponse:
       type: object

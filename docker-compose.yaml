@@ -10,7 +10,7 @@ services:
       retries: 10
     restart: always
     ports:
-      - 5432:5432
+      - "$WR_PG_PORT:5432"
     environment:
       POSTGRES_USER: $WR_PG_USER
       POSTGRES_PASSWORD: $WR_PG_PASS

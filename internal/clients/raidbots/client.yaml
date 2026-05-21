@@ -1,0 +1,62 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: RaidBots Static API
+servers:
+  - url: https://www.raidbots.com
+paths:
+  /static/data/live/instances.json:
+    get:
+      operationId: getInstances
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstancesResponse"
+          description: Successful response
+
+components:
+  schemas:
+    InstancesResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/InstanceGroup"
+
+    InstanceGroup:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - encounters
+      properties:
+        id:
+          type: integer
+          description: Индентификатор группы
+        name:
+          type: string
+          description: Название группы
+          example: Mythic+ Dungeons
+        type:
+          type: string
+          description: Тип группы или подземелья
+          example: mplus-chest
+        encounters:
+          type: array
+          description: Список боссов или подземелий
+          items:
+            $ref: "#/components/schemas/Encounter"
+
+    Encounter:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          description: Идентификатор босса или подземелья
+        name:
+          type: string
+          description: Название

@@ -9,6 +9,7 @@ import (
 	"time"
 	"weakRaider/internal/clients"
 	"weakRaider/internal/clients/blizzard"
+	"weakRaider/internal/clients/raidbots"
 	"weakRaider/internal/clients/warcraftlogs"
 	"weakRaider/internal/clients/wowaudit"
 	"weakRaider/internal/config"
@@ -40,6 +41,7 @@ type App struct {
 		BattleNet *blizzard.ClientWithResponses
 		WowAudit  *wowaudit.ClientWithResponses
 		Logs      *warcraftlogs.ClientWithResponses
+		RaidBots  *raidbots.ClientWithResponses
 	}
 
 	Manager struct {
@@ -73,7 +75,15 @@ func (app *App) Run() {
 				app.Manager.CharacterSync.Sync(&v)
 			}
 			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
-
+		case <-time.Tick(app.Config.Tickers.SyncDictionaries):
+			app.Logger.Info().Msg("[Dictionaries] Start sync.")
+			if err := app.Manager.SeasonSync.Sync(); err != nil {
+				app.Logger.Err(err).Msg(fmt.Sprintf("[Dictionaries] Failed sync seasons: %v", err))
+			}
+			if err := app.Manager.SeasonSync.SyncInstances(); err != nil {
+				app.Logger.Err(err).Msg(fmt.Sprintf("[Dictionaries] Failed sync instances: %v", err))
+			}
+			app.Logger.Info().Msg("[Dictionaries] End sync.")
 		case <-ctx.Done():
 			return
 			//shutdown sequence
@@ -97,6 +107,9 @@ func (app *App) Initialize() error {
 	// logger
 	logger := appLogger.LogInit(cfg.Project.Debug)
 	app.Logger = &logger
+
+	// keys
+	app.Keys = &clients.ApiKeys{}
 
 	// database
 	app.db, err = app.configureGorm()
@@ -133,6 +146,10 @@ func (app *App) configureClients() error {
 		return err
 	}
 
+	if app.Client.RaidBots, err = raidbots.NewClientWithResponses(raidbots.ServerUrlHttpswwwRaidbotsCom, raidbots.WithHTTPClient(&hc)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -144,9 +161,12 @@ func (app *App) configureManagers() {
 		app.Keys,
 	)
 	app.Manager.SeasonSync = manager.NewSeasonSync(
+		app.Config,
 		app.Repository.Season,
 		app.Repository.Instance,
 		app.Client.Blizzard,
+		app.Client.WowAudit,
+		app.Client.RaidBots,
 		app.Manager.Auth,
 	)
 	app.Manager.CharacterSync = manager.NewCharacterSync(

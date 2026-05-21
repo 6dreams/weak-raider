@@ -16,3 +16,5 @@ database:
 
 tickers:
   wowAudit: 24h
+  sync_seasons: 24h
+  sync_dictionaries: 5s

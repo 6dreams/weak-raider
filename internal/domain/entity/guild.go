@@ -4,7 +4,7 @@ import "time"
 
 type Guild struct {
 	// Идентификатор гильдии, генерируется автоматически.
-	ID int `gorm:"primary_key;column:id;type:bigserial;not null"`
+	ID int `gorm:"primary_key;column:id;type:bigint;primaryKey;autoIncrement;not null"`
 
 	// Название гильдии.
 	Name string `gorm:"column:name;type:text;not null"`

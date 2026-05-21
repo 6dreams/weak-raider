@@ -55,11 +55,14 @@ type Secrets struct {
 		Client string `env:"WR_WARCRAFTLOGS_CLIENT"`
 		Secret string `env:"WR_WARCRAFTLOGS_SECRET"`
 	}
+	WowAudit string `env:"WR_WOW_AUDIT_SECRET"`
 }
 
 // Tickers - contains all tickrates for API's
 type Tickers struct {
-	WoWAudit time.Duration `yaml:"wowAudit"`
+	WoWAudit         time.Duration `yaml:"wowAudit"`
+	SyncSeasons      time.Duration `yaml:"sync_seasons"`
+	SyncDictionaries time.Duration `yaml:"sync_dictionaries"`
 }
 
 // Config - contains all configuration parameters in config package.

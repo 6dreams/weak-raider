@@ -18,6 +18,19 @@ paths:
                 $ref: "#/components/schemas/CharactersResponse"
           description: Successful response
 
+  /v1/period:
+    get:
+      operationId: getPeriod
+      parameters:
+        - $ref: "#/components/parameters/Authorization"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PeriodResponse"
+          description: Successful response
+
 components:
   parameters:
     Authorization:
@@ -33,6 +46,24 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Character'
+
+    PeriodResponse:
+      type: object
+      required:
+        - current_season
+      properties:
+        current_season:
+          type: object
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+              description: ID сезона в wow audit
+            name:
+              type: string
+              description: Название сезона в wow audit
 
     Character:
       type: object

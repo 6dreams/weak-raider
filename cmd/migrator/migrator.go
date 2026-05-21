@@ -42,7 +42,7 @@ func main() {
 	defer sqlDB.Close()
 
 	if *migration {
-		if err = goose.Down(sqlDB, cfg.Database.Migrations); err != nil {
+		if err = goose.Up(sqlDB, cfg.Database.Migrations); err != nil {
 			log.Error().Err(err).Msg("Migration failed")
 			return
 		}

@@ -10,6 +10,6 @@ Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}
 
 ### Journal: Детали о подземелье. Список энкаунтеров.
-GET https://eu.api.blizzard.com/data/wow/journal-instance/1307?locale=en_US
+GET https://eu.api.blizzard.com/data/wow/journal-instance/1302
 Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}
