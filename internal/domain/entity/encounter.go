@@ -22,6 +22,7 @@ type Encounter struct {
 
 	// Идентификатор боя, берётся из API WarcraftLogs.
 	LogsEncounterID sql.NullInt64 `gorm:"column:logs_encounter_id;type:bigint;null"`
+	LogsEncounterID sql.NullInt64 `gorm:"column:logs_encounter_id;type:bigint;null"`
 
 	// Время последнего обновления информации о бое.
 	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now();autoUpdateTime:milli"`
