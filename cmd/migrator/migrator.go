@@ -51,5 +51,10 @@ func main() {
 			log.Error().Err(err).Msg("Migration-down failed")
 			return
 		}
+	} else {
+		if err = goose.Down(sqlDB, cfg.Database.Migrations); err != nil {
+			log.Error().Err(err).Msg("Migration failed")
+			return
+		}
 	}
 }
