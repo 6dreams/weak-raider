@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/oapi-codegen/oapi-codegen/HEAD/configuration-schema.json
+package: raidbots
+generate:
+  client: true
+  models: true
+  server-urls: true
+output: internal/clients/raidbots/client.gen.go
+output-options:
+  skip-prune: true

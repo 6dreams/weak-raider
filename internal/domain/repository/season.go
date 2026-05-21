@@ -18,16 +18,20 @@ func NewSeasonRepository(db *gorm.DB) *SeasonRepository {
 }
 
 func (r *SeasonRepository) Upsert(season *entity.Season) error {
-	return r.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&season).Error
+	return r.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(season).Error
+}
+
+func (r *SeasonRepository) Update(season *entity.Season) error {
+	return r.db.Save(season).Error
 }
 
 func (r *SeasonRepository) FindAll() (entity.SeasonMap, error) {
 	var seasons []entity.Season
-	if err := r.db.Find(&seasons).Error; err != nil {
+	if err := r.db.Model(entity.Season{}).Find(&seasons).Error; err != nil {
 		return nil, ErrSeasonsNotFound
 	}
 
-	mapped := entity.SeasonMap{}
+	mapped := make(entity.SeasonMap)
 	for _, season := range seasons {
 		mapped[season.BlizzardId] = season
 	}

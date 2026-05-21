@@ -1,0 +1,24 @@
+### Talents List
+GET https://eu.api.blizzard.com/data/wow/talent-tree/index?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+### Talents for class
+GET https://eu.api.blizzard.com/data/wow/talent-tree/774/playable-specialization/254?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+### Class info
+GET https://eu.api.blizzard.com/data/wow/playable-class/3?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+
+### Class info
+GET https://eu.api.blizzard.com/data/wow/playable-specialization/254?locale=en_US
+Battlenet-Namespace: static-eu
+Authorization: Bearer {{access_token}}
+Accept: application/json
+

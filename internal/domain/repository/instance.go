@@ -1,9 +1,10 @@
 package repository
 
 import (
+	"weakRaider/internal/domain/entity"
+
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"weakRaider/internal/domain/entity"
 )
 
 type InstanceRepository struct {
@@ -15,8 +16,22 @@ func NewInstanceRepository(db *gorm.DB) *InstanceRepository {
 }
 
 func (r *InstanceRepository) FindAll() (entity.InstanceMap, error) {
-	instances := entity.InstanceMap{}
-	if err := r.db.Model(entity.Instance{}).Find(&instances).Error; err != nil {
+	instances := make(entity.InstanceMap)
+	var instanceList []entity.Instance
+	if err := r.db.Model(entity.Instance{}).Find(&instanceList).Error; err != nil {
+		return nil, err
+	}
+
+	for _, instance := range instanceList {
+		instances[instance.ID] = instance
+	}
+
+	return instances, nil
+}
+
+func (r *InstanceRepository) FindWithInstances() ([]entity.Instance, error) {
+	instances := make([]entity.Instance, 0)
+	if err := r.db.Model(entity.Instance{}).Preload("Encounters").Find(&instances).Error; err != nil {
 		return nil, err
 	}
 
