@@ -39,6 +39,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEIndexResponse'
 
+  /data/wow/journal-instance/{instance_id}?locale=en_US:
+    get:
+      operationId: journalInstance
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/InstanceId'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JEInstanceResponse'
+
   /data/wow/journal-instance/{instance_id}:
     get:
       operationId: journalInstance

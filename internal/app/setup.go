@@ -162,8 +162,6 @@ func (app *App) configureManagers() {
 		app.Keys,
 	)
 	app.Manager.SeasonSync = manager.NewSeasonSync(
-		app.Config,
-		app.Logger,
 		app.Repository.Season,
 		app.Repository.Instance,
 		app.Repository.Encounter,
