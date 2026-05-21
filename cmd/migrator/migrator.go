@@ -43,12 +43,12 @@ func main() {
 
 	if *migration {
 		if err = goose.Up(sqlDB, cfg.Database.Migrations); err != nil {
-			log.Error().Err(err).Msg("Migration failed")
+			log.Error().Err(err).Msg("Migration-up failed")
 			return
 		}
 	} else {
 		if err = goose.Down(sqlDB, cfg.Database.Migrations); err != nil {
-			log.Error().Err(err).Msg("Migration failed")
+			log.Error().Err(err).Msg("Migration-down failed")
 			return
 		}
 	}
