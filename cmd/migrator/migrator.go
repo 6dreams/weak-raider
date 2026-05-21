@@ -12,12 +12,12 @@ import (
 )
 
 func main() {
+	migration := flag.Bool("migration", true, "Defines the migration start option")
+
 	cfg, err := config.ReadConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed init configuration")
 	}
-
-	migration := flag.Bool("migration", true, "Defines the migration start option")
 
 	dsn := fmt.Sprintf("host=%v port=%v user=%v password=%v dbname=%v sslmode=%v",
 		cfg.Database.Host,
@@ -42,6 +42,11 @@ func main() {
 	defer sqlDB.Close()
 
 	if *migration {
+		if err = goose.Up(sqlDB, cfg.Database.Migrations); err != nil {
+			log.Error().Err(err).Msg("Migration failed")
+			return
+		}
+	} else {
 		if err = goose.Down(sqlDB, cfg.Database.Migrations); err != nil {
 			log.Error().Err(err).Msg("Migration failed")
 			return
