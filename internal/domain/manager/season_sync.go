@@ -56,16 +56,6 @@ func NewSeasonSync(
 	}
 }
 
-func getCurrentSeason(seasons *entity.SeasonMap) *entity.Season {
-	for _, season := range *seasons {
-		if season.IsCurrent {
-			return &season
-		}
-	}
-
-	return nil
-}
-
 func (s *SeasonSync) SyncInstances() error {
 	instances, err := s.instanceRepo.FindWithInstances()
 	if err != nil {
@@ -96,10 +86,8 @@ func (s *SeasonSync) SyncInstances() error {
 			for _, encData := range data.JSON200.Encounters {
 				encounter := instance.GetEncounter(encData.Id)
 				if encounter == nil {
-					translation := types.NewTranslation(encData.Name)
 					encounter = &entity.Encounter{
-						Name:       translation.Default(),
-						Names:      &translation,
+						Name:       types.NewTranslation(encData.Name),
 						Instance:   &instance,
 						BlizzardId: encData.Id,
 					}
@@ -255,7 +243,7 @@ func (s *SeasonSync) storeInstances(validInstances map[int]bool, instances *enti
 		if !exists && valid {
 			instance = entity.Instance{
 				ID:       apiInstance.Id,
-				Name:     apiInstance.Name,
+				Name:     types.NewTranslation(apiInstance.Name),
 				SeasonId: season.ID,
 				IsRaid:   isRaid,
 			}
@@ -266,6 +254,16 @@ func (s *SeasonSync) storeInstances(validInstances map[int]bool, instances *enti
 			}
 		}
 	}
+}
+
+func getCurrentSeason(seasons *entity.SeasonMap) *entity.Season {
+	for _, season := range *seasons {
+		if season.IsCurrent {
+			return &season
+		}
+	}
+
+	return nil
 }
 
 func isWowAuditRequired(season *entity.Season) bool {

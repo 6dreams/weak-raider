@@ -54,22 +54,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEInstanceResponse'
 
-  /data/wow/journal-instance/{instance_id}?locale=en_US:
-    get:
-      operationId: journalInstance
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/Namespace'
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        '200':
-          description: Успешный ответ.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JEInstanceResponse'
-
-  /data/wow/journal-expansion/{expansion_id}?locale=en_US:
+  /data/wow/journal-expansion/{expansion_id}:
     get:
       operationId: journalExpansionById
       parameters:
@@ -438,9 +423,7 @@ components:
           - id
         properties:
           name:
-            type: string
-            description: Название подземелья
-            example: Khaz Algar
+            $ref: '#/components/schemas/Translation'
           id:
             type: integer
             description: Идентификатор рейда
@@ -455,9 +438,7 @@ components:
           type: integer
           description: Идентификатор дополнения
         name:
-          type: string
-          description: Название дополнения
-          example: Current Season
+          $ref: '#/components/schemas/Translation'
         dungeons:
           $ref: '#/components/schemas/EJSeasonInstance'
         raids:

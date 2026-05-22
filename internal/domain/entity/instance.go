@@ -1,6 +1,9 @@
 package entity
 
-import "time"
+import (
+	"time"
+	"weakRaider/internal/domain/entity/types"
+)
 
 type InstanceMap = map[int]Instance
 
@@ -15,7 +18,7 @@ type Instance struct {
 	Encounters []Encounter `gorm:"references:Id"`
 
 	// Название подземелья.
-	Name string `gorm:"column:name;type:text;not null"`
+	Name *types.Translation `gorm:"column:name;type:jsonb;not null"`
 
 	// Подземелье является рейдом.
 	IsRaid bool `gorm:"column:is_raid;type:boolean;not null"`

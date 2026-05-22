@@ -41,6 +41,6 @@ func (t *Translation) Scan(value interface{}) error {
 	return json.Unmarshal(bytes, &t)
 }
 
-func NewTranslation(data map[string]string) Translation {
-	return Translation{Data: data}
+func NewTranslation(data map[string]string) *Translation {
+	return &Translation{Data: data}
 }

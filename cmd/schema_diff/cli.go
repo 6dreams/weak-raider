@@ -48,7 +48,8 @@ func main() {
 
 	if len(stmts) > 0 {
 		fmt.Println("\nDatabase schema diff:")
-		fmt.Println(strings.Join(stmts, "\n"))
+		fmt.Print(strings.Join(stmts, ";\n"))
+		fmt.Println(";")
 	} else {
 		fmt.Println("\nDatabase schema has no changes")
 	}
