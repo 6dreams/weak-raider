@@ -122,8 +122,7 @@ func (s *SeasonSync) SyncInstances() error {
 				if encounter == nil {
 					translation := types.NewTranslation(encData.Name)
 					encounter = &entity.Encounter{
-						Name:       translation.Default(),
-						Names:      &translation,
+						Name:       types.NewTranslation(encData.Name),
 						Instance:   &instance,
 						BlizzardId: encData.Id,
 					}
