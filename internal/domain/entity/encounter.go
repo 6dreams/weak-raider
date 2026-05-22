@@ -11,9 +11,7 @@ type Encounter struct {
 	ID int `gorm:"primary_key;column:id;type:bigint;primaryKey;autoIncrement;not null"`
 
 	// Имя босса.
-	Name string `gorm:"column:name;type:text;not null"`
-
-	Names *types.Translation `gorm:"type:jsonb;not null"`
+	Name *types.Translation `gorm:"column:name;type:jsonb;not null"`
 
 	BlizzardId int `gorm:"column:blizzard_id;type:int;not null"`
 
