@@ -100,6 +100,42 @@ func (s *SeasonSync) SyncInstances() error {
 			}
 		}
 	}
+	key, err := s.authManager.BlizzardKey()
+	if err != nil {
+		return err
+	}
+
+	for _, instance := range instances {
+		if s.isInstanceRequireUpdate(&instance) {
+			data, err := s.blizzard.JournalInstanceWithResponse(context.TODO(), strconv.Itoa(instance.ID), &blizzard.JournalInstanceParams{
+				Authorization:      key,
+				BattlenetNamespace: blizzard.JournalInstanceParamsBattlenetNamespaceStaticEu,
+			})
+
+			if err != nil || data.JSON200 == nil {
+				s.Logger.Error().Msgf("[InstanceSync] failed update instance `%v`: %v", instance.ID, err)
+				continue
+			}
+
+			for _, encData := range data.JSON200.Encounters {
+				encounter := instance.GetEncounter(encData.Id)
+				if encounter == nil {
+					translation := types.NewTranslation(encData.Name)
+					encounter = &entity.Encounter{
+						Name:       translation.Default(),
+						Names:      &translation,
+						Instance:   &instance,
+						BlizzardId: encData.Id,
+					}
+
+					err = s.encounterRepo.Upsert(encounter)
+					if err != nil {
+						s.Logger.Error().Msgf("[InstanceSync] failed update instance `%v`: %v", instance.ID, err)
+					}
+				}
+			}
+		}
+	}
 
 	return nil
 }
