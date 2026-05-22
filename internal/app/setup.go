@@ -32,6 +32,7 @@ type App struct {
 	Repository struct {
 		Season    *repository.SeasonRepository
 		Instance  *repository.InstanceRepository
+		Encounter *repository.EncounterRepository
 		Character *repository.CharacterRepository
 		Guild     *repository.GuildRepository
 	}
@@ -162,8 +163,10 @@ func (app *App) configureManagers() {
 	)
 	app.Manager.SeasonSync = manager.NewSeasonSync(
 		app.Config,
+		app.Logger,
 		app.Repository.Season,
 		app.Repository.Instance,
+		app.Repository.Encounter,
 		app.Client.Blizzard,
 		app.Client.WowAudit,
 		app.Client.RaidBots,
@@ -212,6 +215,7 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	// repositories
 	app.Repository.Season = repository.NewSeasonRepository(db)
 	app.Repository.Instance = repository.NewInstanceRepository(db)
+	app.Repository.Encounter = repository.NewEncounterRepository(db)
 	app.Repository.Character = repository.NewCharacterRepository(db)
 	app.Repository.Guild = repository.NewGuildRepository(db)
 

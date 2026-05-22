@@ -11,50 +11,49 @@ import (
 	"weakRaider/internal/clients/wowaudit"
 	"weakRaider/internal/config"
 	"weakRaider/internal/domain/entity"
+	"weakRaider/internal/domain/entity/types"
 	"weakRaider/internal/domain/repository"
+
+	"github.com/rs/zerolog"
 )
 
 var ErrInvalidApiResponse = errors.New("invalid api response, empty or non-parsable body")
 var ErrNothingNoUpdate = errors.New("nothing to update")
 
 type SeasonSync struct {
-	config       *config.Config
-	seasonRepo   *repository.SeasonRepository
-	instanceRepo *repository.InstanceRepository
-	blizzard     *blizzard.ClientWithResponses
-	wowaudit     *wowaudit.ClientWithResponses
-	raidBots     *raidbots.ClientWithResponses
-	authManager  *AuthManager
+	config        *config.Config
+	Logger        *zerolog.Logger
+	seasonRepo    *repository.SeasonRepository
+	instanceRepo  *repository.InstanceRepository
+	encounterRepo *repository.EncounterRepository
+	blizzard      *blizzard.ClientWithResponses
+	wowaudit      *wowaudit.ClientWithResponses
+	raidBots      *raidbots.ClientWithResponses
+	authManager   *AuthManager
 }
 
 func NewSeasonSync(
 	config *config.Config,
+	Logger *zerolog.Logger,
 	seasonRepo *repository.SeasonRepository,
 	instanceRepo *repository.InstanceRepository,
+	encounterRepo *repository.EncounterRepository,
 	blizzard *blizzard.ClientWithResponses,
 	wowaudit *wowaudit.ClientWithResponses,
 	raidBots *raidbots.ClientWithResponses,
 	auth *AuthManager,
 ) *SeasonSync {
 	return &SeasonSync{
-		config:       config,
-		seasonRepo:   seasonRepo,
-		instanceRepo: instanceRepo,
-		blizzard:     blizzard,
-		wowaudit:     wowaudit,
-		raidBots:     raidBots,
-		authManager:  auth,
+		config:        config,
+		Logger:        Logger,
+		seasonRepo:    seasonRepo,
+		instanceRepo:  instanceRepo,
+		encounterRepo: encounterRepo,
+		blizzard:      blizzard,
+		wowaudit:      wowaudit,
+		raidBots:      raidBots,
+		authManager:   auth,
 	}
-}
-
-func getCurrentSeason(seasons *entity.SeasonMap) *entity.Season {
-	for _, season := range *seasons {
-		if season.IsCurrent {
-			return &season
-		}
-	}
-
-	return nil
 }
 
 func (s *SeasonSync) SyncInstances() error {
@@ -67,9 +66,40 @@ func (s *SeasonSync) SyncInstances() error {
 		return ErrNothingNoUpdate
 	}
 
-	//for _, instance := range instances {
-	//
-	//}
+	key, err := s.authManager.BlizzardKey()
+	if err != nil {
+		return err
+	}
+
+	for _, instance := range instances {
+		if s.isInstanceRequireUpdate(&instance) {
+			data, err := s.blizzard.JournalInstanceWithResponse(context.TODO(), strconv.Itoa(instance.ID), &blizzard.JournalInstanceParams{
+				Authorization:      key,
+				BattlenetNamespace: blizzard.JournalInstanceParamsBattlenetNamespaceStaticEu,
+			})
+
+			if err != nil || data.JSON200 == nil {
+				s.Logger.Error().Msgf("[InstanceSync] failed update instance `%v`: %v", instance.ID, err)
+				continue
+			}
+
+			for _, encData := range data.JSON200.Encounters {
+				encounter := instance.GetEncounter(encData.Id)
+				if encounter == nil {
+					encounter = &entity.Encounter{
+						Name:       types.NewTranslation(encData.Name),
+						Instance:   &instance,
+						BlizzardId: encData.Id,
+					}
+
+					err = s.encounterRepo.Upsert(encounter)
+					if err != nil {
+						s.Logger.Error().Msgf("[InstanceSync] failed update instance `%v`: %v", instance.ID, err)
+					}
+				}
+			}
+		}
+	}
 
 	return nil
 }
@@ -213,7 +243,7 @@ func (s *SeasonSync) storeInstances(validInstances map[int]bool, instances *enti
 		if !exists && valid {
 			instance = entity.Instance{
 				ID:       apiInstance.Id,
-				Name:     apiInstance.Name,
+				Name:     types.NewTranslation(apiInstance.Name),
 				SeasonId: season.ID,
 				IsRaid:   isRaid,
 			}
@@ -226,8 +256,22 @@ func (s *SeasonSync) storeInstances(validInstances map[int]bool, instances *enti
 	}
 }
 
+func getCurrentSeason(seasons *entity.SeasonMap) *entity.Season {
+	for _, season := range *seasons {
+		if season.IsCurrent {
+			return &season
+		}
+	}
+
+	return nil
+}
+
 func isWowAuditRequired(season *entity.Season) bool {
 	return !season.WowAuditId.Valid || "" == season.Name
+}
+
+func (s *SeasonSync) isInstanceRequireUpdate(instance *entity.Instance) bool {
+	return len(instance.Encounters) == 0 || !instance.UpdatedAt.Add(s.config.Tickers.SyncSeasons).After(time.Now())
 }
 
 func (s *SeasonSync) isSeasonUpdateRequired(season *entity.Season) bool {

@@ -3,6 +3,7 @@ package entity
 import (
 	"database/sql"
 	"time"
+	"weakRaider/internal/domain/entity/types"
 )
 
 type Encounter struct {
@@ -10,7 +11,7 @@ type Encounter struct {
 	ID int `gorm:"primary_key;column:id;type:bigint;primaryKey;autoIncrement;not null"`
 
 	// Имя босса.
-	Name string `gorm:"column:name;type:text;not null"`
+	Name *types.Translation `gorm:"column:name;type:jsonb;not null"`
 
 	BlizzardId int `gorm:"column:blizzard_id;type:int;not null"`
 

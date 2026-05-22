@@ -28,7 +28,7 @@ func (c *CharacterRepository) Upsert(character *entity.Character) error {
 }
 
 func (c *CharacterRepository) FindAll(guild *entity.Guild) (entity.CharacterMap, error) {
-	characters := []entity.Character{}
+	var characters []entity.Character
 	charMap := entity.CharacterMap{}
 
 	result := c.db.
