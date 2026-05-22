@@ -19,7 +19,7 @@ func (c *GuildRepository) Create(guild *entity.Guild) error {
 }
 
 func (c *GuildRepository) FindAll() ([]entity.Guild, error) {
-	guilds := []entity.Guild{}
+	guilds := make([]entity.Guild, 0)
 
 	if err := c.db.Model(entity.Guild{}).Find(&guilds).Error; err != nil {
 		return nil, err

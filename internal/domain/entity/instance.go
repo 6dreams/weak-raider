@@ -27,3 +27,13 @@ type Instance struct {
 func (i Instance) TableName() string {
 	return "instance"
 }
+
+func (i Instance) GetEncounter(id int) *Encounter {
+	for _, encounter := range i.Encounters {
+		if encounter.ID == id {
+			return &encounter
+		}
+	}
+
+	return nil
+}
