@@ -39,7 +39,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEIndexResponse'
 
-  /data/wow/journal-instance/{instance_id}?locale=en_US:
+  /data/wow/journal-instance/{instance_id}:
     get:
       operationId: journalInstance
       parameters:
@@ -265,16 +265,21 @@ components:
         name:
           $ref: "#/components/schemas/Translation"
         encounters:
-          type: object
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: integer
-              description: Идентификатор босса подземелья.
-            name:
-              $ref: '#/components/schemas/Translation'
+          type: array
+          items:
+            $ref: '#/components/schemas/JEInstanceEncounter'
+
+    JEInstanceEncounter:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          description: Идентификатор босса подземелья.
+        name:
+          $ref: '#/components/schemas/Translation'
 
     JEIndexResponse:
       type: object
