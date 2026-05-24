@@ -39,21 +39,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/JEIndexResponse'
 
-  /data/wow/journal-instance/{instance_id}?locale=en_US:
-    get:
-      operationId: journalInstance
-      parameters:
-        - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/Namespace'
-        - $ref: '#/components/parameters/InstanceId'
-      responses:
-        '200':
-          description: Успешный ответ.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JEInstanceResponse'
-
   /data/wow/journal-instance/{instance_id}:
     get:
       operationId: journalInstance
@@ -103,7 +88,6 @@ paths:
   /data/wow/talent-tree/index?locale=en_US:
     get:
       operationId: GetTalentTrees
-      operationId: GetTalentTrees
       parameters: 
         - $ref: '#/components/parameters/Namespace'
         - $ref: '#/components/parameters/Authorization' 
@@ -130,25 +114,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/TalentsResponse'
           description: Get Talents lists
-
-          description: Get talent trees
-
-  /data/wow/talent-tree/{talentTreeId}/playable-specialization/{specId}?locale=en_US:
-    get:
-      operationId: GetTalents
-      parameters:
-        - $ref: '#/components/parameters/Namespace'
-        - $ref: '#/components/parameters/Authorization'
-        - $ref: '#/components/parameters/TalentTreeId'
-        - $ref: '#/components/parameters/SpecId'
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TalentsResponse'
-          description: Get Talents lists
-
 
 components:
   parameters:
@@ -191,27 +156,7 @@ components:
       schema:
         type: string
       in: path
-    InstanceId:
-      name: instance_id
-      description: Идентификатор подземелья
-      required: true
-      schema:
-        type: string
-      in: path
-    TalentTreeId:
-      name: talentTreeId
-      description: talent tree id for query
-      required: true
-      schema:
-        type: string
-      in: path
-    SpecId:
-      name: specId
-      description: specialisation tree id for query
-      required: true
-      schema:
-        type: string
-      in: path
+      
     InstanceId:
       name: instance_id
       description: Идентификатор подземелья
@@ -381,32 +326,6 @@ components:
         name:
           $ref: '#/components/schemas/Translation'
 
-    Translation:
-      type: object
-      additionalProperties:
-        type: string
-
-
-    JEInstanceResponse:
-      type: object
-      required:
-        - name
-        - encounters
-      properties:
-        name:
-          $ref: "#/components/schemas/Translation"
-        encounters:
-          type: object
-          required:
-            - id
-            - name
-          properties:
-            id:
-              type: integer
-              description: Идентификатор босса подземелья.
-            name:
-              $ref: '#/components/schemas/Translation'
-
     JEIndexResponse:
       type: object
       required:
@@ -496,7 +415,6 @@ components:
     TalentsResponse:
       type: object
       required:
-      - id
       - playable_class
       - playable_specialization
       - name
@@ -504,20 +422,17 @@ components:
       - spec_talent_nodes
       - hero_talent_trees
       properties:
-        id:
-          type: integer
-          description: ID класса
         playable_class:
-          $ref: '#/components/schemas/playable_talent_set'
+          $ref: '#/components/schemas/PlayableTalentSet'
         playable_specialization:
-          $ref: '#/components/schemas/playable_talent_set'
+          $ref: '#/components/schemas/PlayableTalentSet'
         name:
           type: string
           description: Название класса
         class_talent_nodes:
-          $ref: '#/components/schemas/talent_nodes_set'
+          $ref: '#/components/schemas/TalentNodesSet'
         spec_talent_nodes:
-          $ref: '#/components/schemas/talent_nodes_set'
+          $ref: '#/components/schemas/TalentNodesSet'
         hero_talent_trees:
           type: array
           items:
@@ -526,6 +441,7 @@ components:
               - id
               - name
               - hero_talent_nodes
+              - playable_specializations
             properties:
               id:
                 type: integer
@@ -566,7 +482,7 @@ components:
                                 - name
                               properties:
                                 name:
-                                  type: string
+                                  $ref: '#/components/schemas/Translation'
                     display_row:
                       type: integer
                     display_col:
@@ -575,22 +491,31 @@ components:
                       type: integer
                     raw_position_y:
                       type: integer
+              playable_specializations:
+                type: array
+                items:
+                  type: object
+                  required:
+                   - id
+                   - name
+                  properties:
+                    id:
+                      type: integer
+                      description: ID специализации
+                    name:
+                      $ref: '#/components/schemas/Translation'
 
-    talent_nodes_set:
+    TalentNodesSet:
       type: array
       items:
         type: object
         required:
-          - id
           - ranks
           - display_row
           - display_col
           - raw_position_x
           - raw_position_y
         properties:
-          id:
-            type: integer
-            description: ID таланта
           ranks:
             type: array
             items:
@@ -603,15 +528,35 @@ components:
                   type: integer
                 tooltip:
                   type: object
+                  required:
+                    - talent
+                    - spell_tooltip
                   properties:
                     talent:
                       type: object
                       required:
                         - name
+                        - id
                       properties:
+                        id:
+                          type: integer
                         name:
-                          type: string
-
+                          $ref: '#/components/schemas/Translation'
+                    spell_tooltip:
+                      type: object
+                      required:
+                        - spell
+                      properties:
+                        spell:
+                          type: object
+                          required:
+                            - name
+                            - id
+                          properties:
+                            id:
+                              type: integer
+                            name:
+                              $ref: '#/components/schemas/Translation'
           display_row:
             type: integer
           display_col:
@@ -621,15 +566,56 @@ components:
           raw_position_y:
             type: integer
             
-    playable_talent_set:
+    PlayableTalentSet:
       type: object
       required:
         - name
         - id
       properties:
         name:
-          type: string
-          description: название класса/спека
+          $ref: '#/components/schemas/Translation'
         id:
           type: integer
-          description: ID класса/спека (ID класса отличается от основного ID TalentsResponse)
+          description: ID класса/спека (ID класса отличается от ID TalentsResponse)
+
+    Talent:
+      type: object
+      required:
+        - talent
+        - spell_tooltip
+      properties:
+        talent:
+          type: object
+          required:
+            - name
+            - id
+          properties:
+            id:
+              type: integer
+            name:
+              $ref: '#/components/schemas/Translation'
+        spell_tooltip:
+          type: object
+          required:
+            - spell
+          properties:
+            spell:
+              type: object
+              required:
+                - name
+                - id
+              properties:
+                id:
+                  type: integer
+                name:
+                  $ref: '#/components/schemas/Translation'
+
+      ChoiceOfTalents:
+        type: array
+        items:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              $ref: '#/components/schemas/Translation'
