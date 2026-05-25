@@ -24,7 +24,7 @@ type Instance struct {
 	IsRaid bool `gorm:"column:is_raid;type:boolean;not null"`
 
 	// Время последнего обновления.
-	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now()"`
+	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now();autoUpdateTime:milli"`
 }
 
 func (i Instance) TableName() string {
@@ -33,7 +33,7 @@ func (i Instance) TableName() string {
 
 func (i Instance) GetEncounter(id int) *Encounter {
 	for _, encounter := range i.Encounters {
-		if encounter.ID == id {
+		if encounter.BlizzardId == id {
 			return &encounter
 		}
 	}
