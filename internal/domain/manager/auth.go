@@ -13,15 +13,21 @@ import (
 type AuthManager struct {
 	config   *config.Config
 	blizzard *blizzard.ClientWithResponses
+	wl       *warcraftlogs.ClientWithResponses
 	logs     *warcraftlogs.ClientWithResponses
 	keys     *clients.ApiKeys
 }
 
-func NewAuthManager(config *config.Config, blizzard *blizzard.ClientWithResponses, logs *warcraftlogs.ClientWithResponses, keys *clients.ApiKeys) *AuthManager {
+func NewAuthManager(
+	config *config.Config,
+	blizzard *blizzard.ClientWithResponses,
+	wl *warcraftlogs.ClientWithResponses,
+	keys *clients.ApiKeys,
+) *AuthManager {
 	return &AuthManager{
 		config:   config,
 		blizzard: blizzard,
-		logs:     logs,
+		wl:       wl,
 		keys:     keys,
 	}
 }
@@ -58,7 +64,31 @@ func (a *AuthManager) BlizzardKey() (string, error) {
 }
 
 func (a *AuthManager) LogsKey() (string, error) {
-	// todo: impl me
+	if a.keys.Logs == nil {
+		resp, err := a.wl.AuthorizeWithFormdataBodyWithResponse(
+			context.TODO(),
+			&warcraftlogs.AuthorizeParams{
+				Authorization: fmt.Sprintf(
+					"Basic %s",
+					base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf(
+						"%s:%s",
+						a.config.Auth.Logs.Client,
+						a.config.Auth.Logs.Secret,
+					))),
+				),
+			},
+			warcraftlogs.AuthorizeFormdataRequestBody{
+				GrantType: "client_credentials",
+			},
+		)
 
-	return "", nil
+		if err != nil || resp.JSON200 == nil {
+			return "", err
+		}
+
+		key := fmt.Sprintf("Bearer %s", resp.JSON200.AccessToken)
+		a.keys.Logs = &key
+	}
+
+	return *a.keys.Logs, nil
 }

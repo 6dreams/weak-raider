@@ -49,6 +49,7 @@ type App struct {
 		Auth          *manager.AuthManager
 		SeasonSync    *manager.SeasonSync
 		CharacterSync *manager.CharacterSync
+		WarcraftLogs  *manager.WarcraftLogs
 	}
 
 	Keys *clients.ApiKeys
@@ -73,7 +74,9 @@ func (app *App) Run() {
 				continue
 			}
 			for _, v := range guilds {
-				app.Manager.CharacterSync.Sync(&v)
+				if err := app.Manager.CharacterSync.Sync(&v); err != nil {
+					app.Logger.Err(err).Msg(fmt.Sprintf("[GuildSync] failed sync guild `%s`", v.Name))
+				}
 			}
 			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
 		case <-time.Tick(app.Config.Tickers.SyncDictionaries):
@@ -85,6 +88,11 @@ func (app *App) Run() {
 				app.Logger.Err(err).Msg(fmt.Sprintf("[Dictionaries] Failed sync instances: %v", err))
 			}
 			app.Logger.Info().Msg("[Dictionaries] End sync.")
+			app.Logger.Info().Msg("[WarcraftLogs] Start sync.")
+			if err := app.Manager.WarcraftLogs.Sync(); err != nil {
+				app.Logger.Err(err).Msg(fmt.Sprintf("[WarcraftLogs] Failed sync warcraft logs: %v", err))
+			}
+			app.Logger.Info().Msg("[WarcraftLogs] End sync.")
 		case <-ctx.Done():
 			return
 			//shutdown sequence
@@ -170,6 +178,9 @@ func (app *App) configureManagers() {
 		app.Client.Blizzard,
 		app.Client.WowAudit,
 		app.Client.RaidBots,
+		app.Manager.Auth,
+	)
+	app.Manager.WarcraftLogs = manager.NewWarcraftLogs(
 		app.Manager.Auth,
 	)
 	app.Manager.CharacterSync = manager.NewCharacterSync(

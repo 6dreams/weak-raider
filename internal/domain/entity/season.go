@@ -24,7 +24,7 @@ type Season struct {
 	IsCurrent bool `gorm:"column:is_current;type:boolean;not null"`
 
 	// Время последнего обновления.
-	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now()"`
+	UpdatedAt time.Time `gorm:"column:updated_at;type:timestamptz;not null;default:now();autoUpdateTime:milli"`
 }
 
 func (s Season) TableName() string {

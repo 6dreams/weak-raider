@@ -6,6 +6,7 @@ Tooling for World of Warcraft.
 ```bash
 cp .env.dist .env
 go install github.com/oapi-codegen/oapi-codegen
+go get github.com/Khan/genqlient
 ```
 
 Запустить docker-compose (если база будет в docker):

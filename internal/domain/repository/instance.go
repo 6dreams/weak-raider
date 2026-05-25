@@ -41,3 +41,7 @@ func (r *InstanceRepository) FindWithInstances() ([]entity.Instance, error) {
 func (r *InstanceRepository) Upsert(instance *entity.Instance) error {
 	return r.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&instance).Error
 }
+
+func (r *InstanceRepository) Update(instance *entity.Instance) error {
+	return r.db.Save(&instance).Error
+}

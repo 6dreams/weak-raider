@@ -1,0 +1,11 @@
+# genqlient config; for documentation see: https://github.com/Khan/genqlient/blob/main/docs/genqlient.yaml
+schema: client.graphql
+operations:
+- queries.graphql
+generated: client.gen.go
+
+bindings:
+  DateTime:
+    type: time.Time
+  JSON:
+    type: encoding/json.RawMessage

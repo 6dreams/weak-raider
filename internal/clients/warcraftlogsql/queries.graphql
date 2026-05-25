@@ -1,0 +1,46 @@
+# Получение логов по ID гильдии.
+query GetGuildReports($GuildID: Int) {
+    reportData {
+        reports(guildID: $GuildID, limit: 15, page: 1) {
+            data {
+                code
+                title
+                startTime
+                endTime
+                zone { id name }
+            }
+        }
+    }
+}
+
+# Получение данных о конкретном логе.
+query GetReportInfo($ReportCode: String) {
+    reportData {
+        report(code: $ReportCode) {
+            fights {
+                id
+                encounterID
+                name
+                startTime
+                endTime
+                kill
+                difficulty
+                friendlyPlayers
+            }
+            events(dataType: CombatantInfo, startTime: 0, endTime: 9999999999) {
+                data
+            }
+        }
+    }
+}
+
+# Получение рейтингов босса по классу и специализации.
+query GetEncounterRankings($EncounterID: Int, $ClassName: String, $SpecName: String) {
+    worldData {
+        encounter(id: $EncounterID) {
+            id
+            name
+            characterRankings(metric: dps difficulty: 5 includeCombatantInfo: true className: $ClassName specName: $SpecName page: 1)
+        }
+    }
+}

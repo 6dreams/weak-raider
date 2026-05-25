@@ -94,9 +94,18 @@ func (s *SeasonSync) SyncInstances() error {
 
 					err = s.encounterRepo.Upsert(encounter)
 					if err != nil {
-						s.Logger.Error().Msgf("[InstanceSync] failed update instance `%v`: %v", instance.ID, err)
+						s.Logger.Error().Msgf("[InstanceSync] failed upsert encounter `%v`: %v", instance.ID, err)
+					}
+				} else {
+					encounter.Name = types.NewTranslation(encData.Name)
+					err = s.encounterRepo.Update(encounter)
+					if err != nil {
+						s.Logger.Error().Msgf("[InstanceSync] failed update encounter `%v`: %v", instance.ID, err)
 					}
 				}
+			}
+			if err := s.instanceRepo.Update(&instance); err != nil {
+				s.Logger.Error().Msgf("[InstanceSync] failed update instance: `%v`: %v", instance.ID, err)
 			}
 		}
 	}
