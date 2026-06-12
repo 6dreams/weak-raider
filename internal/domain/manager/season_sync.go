@@ -280,11 +280,11 @@ func isWowAuditRequired(season *entity.Season) bool {
 }
 
 func (s *SeasonSync) isInstanceRequireUpdate(instance *entity.Instance) bool {
-	return len(instance.Encounters) == 0 || !instance.UpdatedAt.Add(s.config.Tickers.SyncSeasons).After(time.Now())
+	return len(instance.Encounters) == 0 || !instance.UpdatedAt.Add(s.config.Tickers.DailySync).After(time.Now())
 }
 
 func (s *SeasonSync) isSeasonUpdateRequired(season *entity.Season) bool {
-	return !season.UpdatedAt.Add(s.config.Tickers.SyncSeasons).After(time.Now())
+	return !season.UpdatedAt.Add(s.config.Tickers.DailySync).After(time.Now())
 }
 
 func (s *SeasonSync) getSeasonInstances() (map[int]bool, error) {
