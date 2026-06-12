@@ -60,8 +60,7 @@ type Secrets struct {
 
 // Tickers - contains all tickrates for API's
 type Tickers struct {
-	WoWAudit         time.Duration `yaml:"wowAudit"`
-	SyncSeasons      time.Duration `yaml:"sync_seasons"`
+	DailySync        time.Duration `yaml:"daily_sync"`
 	SyncDictionaries time.Duration `yaml:"sync_dictionaries"`
 }
 

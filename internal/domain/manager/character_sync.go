@@ -27,18 +27,18 @@ func (c *CharacterSync) Sync(guild *entity.Guild) error {
 		return err
 	}
 
-	expResp, err := c.wowAudit.GetCharactersWithResponse(
+	resp, err := c.wowAudit.GetCharactersWithResponse(
 		context.Background(),
 		&wowaudit.GetCharactersParams{Authorization: guild.WowauditKey},
 	)
 	if err != nil {
 		return err
 	}
-	if expResp.JSON200 == nil {
+	if resp.JSON200 == nil {
 		return ErrInvalidApiResponse
 	}
 
-	for _, v := range *expResp.JSON200 {
+	for _, v := range *resp.JSON200 {
 		_, ok := characters[v.Name+v.Realm]
 		character := &entity.Character{
 			Name:    v.Name,

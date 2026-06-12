@@ -15,6 +15,5 @@ database:
     connMaxLifeTime: 5m
 
 tickers:
-  wowAudit: 24h
-  sync_seasons: 24h
+  daily_sync: 24h #wowAudit, seasons, talents
   sync_dictionaries: 5s

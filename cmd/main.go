@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/rs/zerolog/log"
 	baseApp "weakRaider/internal/app"
+
+	"github.com/rs/zerolog/log"
 )
 
 func main() {

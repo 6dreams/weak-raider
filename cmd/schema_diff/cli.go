@@ -18,6 +18,7 @@ var entities = []interface{}{
 	entity.Item{},
 	entity.Season{},
 	entity.Slot{},
+	entity.Talents{},
 }
 
 func main() {

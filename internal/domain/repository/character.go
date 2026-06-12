@@ -24,7 +24,7 @@ func (c *CharacterRepository) Update(character *entity.Character) error {
 }
 
 func (c *CharacterRepository) Upsert(character *entity.Character) error {
-	return c.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(&character).Error
+	return c.db.Clauses(clause.OnConflict{UpdateAll: true}).Create(character).Error
 }
 
 func (c *CharacterRepository) FindAll(guild *entity.Guild) (entity.CharacterMap, error) {

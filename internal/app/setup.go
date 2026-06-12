@@ -35,6 +35,7 @@ type App struct {
 		Encounter *repository.EncounterRepository
 		Character *repository.CharacterRepository
 		Guild     *repository.GuildRepository
+		Talent    *repository.TalentsRepository
 	}
 
 	Client struct {
@@ -50,6 +51,7 @@ type App struct {
 		SeasonSync    *manager.SeasonSync
 		CharacterSync *manager.CharacterSync
 		WarcraftLogs  *manager.WarcraftLogs
+		TalentSync    *manager.TalentSync
 	}
 
 	Keys *clients.ApiKeys
@@ -63,11 +65,14 @@ func (app *App) Run() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	wowAuditTicker := time.Tick(app.Config.Tickers.WoWAudit)
+	daily := time.Tick(app.Config.Tickers.DailySync)               //24h
+	dictionaries := time.Tick(app.Config.Tickers.SyncDictionaries) //5s
 
 	for {
 		select {
-		case <-wowAuditTicker:
+		case <-daily:
+			// Characters
+			app.Logger.Info().Msg("[WoWAudit] Start sync.")
 			guilds, err := app.Repository.Guild.FindAll()
 			if err != nil {
 				app.Logger.Err(err).Msg("failed Guild.Findall() in app.Run")
@@ -78,8 +83,17 @@ func (app *App) Run() {
 					app.Logger.Err(err).Msg(fmt.Sprintf("[GuildSync] failed sync guild `%s`", v.Name))
 				}
 			}
-			app.Logger.Info().Msgf("Characters info updated at: %v", time.Now().Format(time.RFC1123))
-		case <-time.Tick(app.Config.Tickers.SyncDictionaries):
+			app.Logger.Info().Msgf("[WoWAudit] End sync. Characters info updated at: %v", time.Now().Format(time.RFC1123))
+
+			// Talents
+			app.Logger.Info().Msg("[Talents] Start sync.")
+			err = app.Manager.TalentSync.Sync()
+			if err != nil {
+				app.Logger.Err(err).Msg("[Talents] failed sync")
+			}
+			app.Logger.Info().Msgf("[Talents] End sync. Talents info updated at: %v", time.Now().Format(time.RFC1123))
+
+		case <-dictionaries:
 			app.Logger.Info().Msg("[Dictionaries] Start sync.")
 			if err := app.Manager.SeasonSync.Sync(); err != nil {
 				app.Logger.Err(err).Msg(fmt.Sprintf("[Dictionaries] Failed sync seasons: %v", err))
@@ -187,6 +201,12 @@ func (app *App) configureManagers() {
 		app.Repository.Character,
 		app.Client.WowAudit,
 	)
+	app.Manager.TalentSync = manager.NewTalentSync(
+		app.Logger,
+		app.Repository.Talent,
+		app.Manager.Auth,
+		app.Client.Blizzard,
+	)
 }
 
 func (app *App) configureGorm() (*gorm.DB, error) {
@@ -220,7 +240,16 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 
 	db, err := gorm.Open(conn, gormConfig)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("gorm Open: %w", err)
+	}
+
+	sql, err := db.DB()
+	if err != nil {
+		return nil, fmt.Errorf("get db: %w", err)
+	}
+
+	if err := sql.Ping(); err != nil {
+		return nil, fmt.Errorf("db ping: %w", err)
 	}
 
 	// repositories
@@ -229,6 +258,7 @@ func (app *App) configureGorm() (*gorm.DB, error) {
 	app.Repository.Encounter = repository.NewEncounterRepository(db)
 	app.Repository.Character = repository.NewCharacterRepository(db)
 	app.Repository.Guild = repository.NewGuildRepository(db)
+	app.Repository.Talent = repository.NewTalentsRepository(db)
 
 	return db, nil
 }

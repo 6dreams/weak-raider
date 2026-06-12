@@ -14,7 +14,7 @@ Authorization: Bearer {{warcraftlogs_access_token}}
 
 {"query":"{ reportData { reports( guildID: 600147, limit: 15, page: 1 ) { data { code title startTime endTime zone { id name } } } } }"}
 
-### Получение данных о игроках в репорте
+### Получение данных об игроках в репорте
 POST https://www.warcraftlogs.com/api/v2/client
 Content-Type: application/json
 Authorization: Bearer {{warcraftlogs_access_token}}

@@ -3,12 +3,17 @@
 run:
 	go run cmd/main.go -config=config.yml -env=.env
 
-.PHONY: migrate
+.PHONY: migrate-up
+.PHONY: migrate-down
+.PHONY: schema_diff
 .PHONY: gen
 
 
-migrate:
+migrate-up:
 	go run cmd/migrator/migrator.go -config config.yml -env .env
+
+migrate-down:
+	go run cmd/migrator/migrator.go -config config.yml -env .env -migration=false
 
 schema-diff:
 	go run cmd/schema_diff/cli.go -config config.yml -env .env
