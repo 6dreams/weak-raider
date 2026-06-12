@@ -65,14 +65,8 @@ func (app *App) Run() {
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
-	daily := time.Tick(app.Config.Tickers.DailySync)
-
-	app.Logger.Info().Msg("[Talents] Start sync.")
-	err := app.Manager.TalentSync.Sync()
-	if err != nil {
-		app.Logger.Err(err).Msg("[Talents] failed sync")
-	}
-	app.Logger.Info().Msgf("[Talents] End sync. Talents info updated at: %v", time.Now().Format(time.RFC1123))
+	daily := time.Tick(app.Config.Tickers.DailySync)               //24h
+	dictionaries := time.Tick(app.Config.Tickers.SyncDictionaries) //5s
 
 	for {
 		select {
@@ -98,7 +92,8 @@ func (app *App) Run() {
 				app.Logger.Err(err).Msg("[Talents] failed sync")
 			}
 			app.Logger.Info().Msgf("[Talents] End sync. Talents info updated at: %v", time.Now().Format(time.RFC1123))
-		case <-time.Tick(app.Config.Tickers.SyncDictionaries):
+
+		case <-dictionaries:
 			app.Logger.Info().Msg("[Dictionaries] Start sync.")
 			if err := app.Manager.SeasonSync.Sync(); err != nil {
 				app.Logger.Err(err).Msg(fmt.Sprintf("[Dictionaries] Failed sync seasons: %v", err))
