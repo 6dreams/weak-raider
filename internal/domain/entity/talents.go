@@ -1,29 +1,32 @@
 package entity
 
-type TalentsJsonB struct {
+import "weakRaider/internal/domain/entity/types"
+
+type Talents struct {
 	// Идентификатор набора талантов, генерируется автоматически.
-	ID int `gorm:"primary_key;column:id;type:bigserial;not null"`
+	Id int `gorm:"primary_key;column:id;type:bigserial;not null"`
 
 	// Название класса
-	ClassName string `gorm:"column:class_name;type:text;not null"`
+	ClassName *types.Translation `gorm:"column:class_name;type:jsonb;not null"`
+	ClassID   int                `gorm:"uniqueIndex:idx_player_talent;column:class_id;type:int;not null"`
 
 	// Название специализации
-	SpecName string `gorm:"column:specialisation_name;type:text;not null"`
+	SpecName *types.Translation `gorm:"column:spec_name;type:jsonb;not null"`
+	SpecID   int                `gorm:"uniqueIndex:idx_player_talent;column:spec_id;type:int;not null"`
 
 	// Название героической ветки талантов
-	HeroSpecName string `gorm:"column:hero_specialisation_name;type:text;not null"`
+	HeroSpecName *types.Translation `gorm:"column:hero_spec_name;type:jsonb;not null"`
+	HeroSpecID   int                `gorm:"uniqueIndex:idx_player_talent;column:hero_spec_id;type:int;not null"`
 
-	// Общий набор талантов, хранящийся в формате JsonB
-	talents []byte `gorm:"column:talents;type:jsonb;not null"`
+	// Общий набор талантов map[spellID]TalentNode, хранящийся в формате JsonB
+	Talents map[int]TalentNode `gorm:"column:talents;type:jsonb;not null"`
 }
 
-type TalentsMap struct {
-	ClassName    string
-	SpecName     string
-	HeroSpecName string
-	Talents      map[int]string
+type TalentNode struct {
+	Ranks int                `json:"ranks"`
+	Name  *types.Translation `json:"name"`
 }
 
-func (t TalentsJsonB) TableName() string {
+func (t Talents) TableName() string {
 	return "talents"
 }

@@ -6,7 +6,8 @@ CREATE TABLE "season" ("id" bigserial NOT NULL,"blizzard_id" bigint NOT NULL,"wo
 CREATE TABLE "instance" ("id" bigserial NOT NULL,"season_id" bigint,"name" text NOT NULL,"is_raid" boolean NOT NULL,"updated_at" timestamptz NOT NULL DEFAULT now(),PRIMARY KEY ("id"),CONSTRAINT "fk_instance_season" FOREIGN KEY ("season_id") REFERENCES "season"("id"));
 CREATE TABLE "slot" ("id" bigserial NOT NULL,"name" text NOT NULL,PRIMARY KEY ("id"));
 CREATE TABLE "item" ("id" bigserial NOT NULL,"name" text NOT NULL,"is_unique" boolean NOT NULL,"sockets" bigint,"instance_id" bigint,"encounter_id" bigint,"slot_id" bigint,PRIMARY KEY ("id"),CONSTRAINT "fk_item_instance" FOREIGN KEY ("instance_id") REFERENCES "instance"("id"),CONSTRAINT "fk_item_encounter" FOREIGN KEY ("encounter_id") REFERENCES "encounter"("id"),CONSTRAINT "fk_item_slot" FOREIGN KEY ("slot_id") REFERENCES "slot"("id"));
-
+CREATE TABLE "talents" ("id" bigserial NOT NULL,"class_name" jsonb NOT NULL,"class_id" bigint NOT NULL,"spec_name" jsonb NOT NULL,"spec_id" bigint NOT NULL,"hero_spec_name" jsonb NOT NULL,"hero_spec_id" bigint NOT NULL,"talents" jsonb NOT NULL,PRIMARY KEY ("id"));
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_player_talent" ON "talents" ("class_id","spec_id","hero_spec_id");
 -- +goose Down
 DROP TABLE IF EXISTS "item";
 DROP TABLE IF EXISTS "slot";
@@ -14,4 +15,7 @@ DROP TABLE IF EXISTS "instance";
 DROP TABLE IF EXISTS "season";
 DROP TABLE IF EXISTS "encounter";
 DROP TABLE IF EXISTS "character";
-DROP TABLE IF EXISTS guild;
+DROP TABLE IF EXISTS "guild";
+DROP INDEX IF EXISTS "idx_player_talent";
+DROP TABLE IF EXISTS "talents";
+
