@@ -1,0 +1,6 @@
+package: warcraftlogsql
+generate:
+  models: true
+output: internal/clients/warcraftlogsql/models.gen.go
+output-options:
+  skip-prune: true

@@ -35,12 +35,12 @@ query GetReportInfo($ReportCode: String) {
 }
 
 # Получение рейтингов босса по классу и специализации.
-query GetEncounterRankings($EncounterID: Int, $ClassName: String, $SpecName: String) {
+query GetEncounterRankings($EncounterID: Int, $ClassName: String, $SpecName: String, $Metric: CharacterRankingMetricType!) {
     worldData {
         encounter(id: $EncounterID) {
             id
             name
-            characterRankings(metric: dps difficulty: 5 includeCombatantInfo: true className: $ClassName specName: $SpecName page: 1)
+            characterRankings(metric: $Metric difficulty: 5 includeCombatantInfo: true className: $ClassName specName: $SpecName page: 1)
         }
     }
 }

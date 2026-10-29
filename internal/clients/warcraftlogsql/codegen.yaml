@@ -5,6 +5,8 @@ operations:
 generated: client.gen.go
 
 bindings:
+  CharacterRankingsJSON:
+    type: '*weakRaider/internal/clients/warcraftlogsql.CharacterRankings'
   DateTime:
     type: time.Time
   JSON:

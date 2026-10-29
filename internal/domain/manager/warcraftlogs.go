@@ -47,7 +47,7 @@ func (w *WarcraftLogs) Sync() error {
 
 	client := graphql.NewClient(warcraftlogs.ServerUrlHttpswwwWarcraftlogsComapiv2client, &httpClient)
 
-	rankings, err := warcraftlogsql.GetEncounterRankings(context.TODO(), client, 3176, "Hunter", "BeastMastery")
+	rankings, err := warcraftlogsql.GetEncounterRankings(context.TODO(), client, 3176, "Hunter", "BeastMastery", warcraftlogsql.CharacterRankingMetricTypeDps)
 	if err != nil {
 		return err
 	}
