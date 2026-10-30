@@ -5,7 +5,7 @@ Tooling for World of Warcraft.
 ## Инициализация проекта
 ```bash
 cp .env.dist .env
-go install github.com/oapi-codegen/oapi-codegen
+go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.8.1
 go get github.com/Khan/genqlient
 ```
 

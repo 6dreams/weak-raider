@@ -23,4 +23,5 @@ gen:
 	oapi-codegen -config internal/clients/blizzard/codegen.yaml internal/clients/blizzard/blizzard.yaml
 	oapi-codegen -config internal/clients/warcraftlogs/codegen.yaml internal/clients/warcraftlogs/warcraftlogs.yaml
 	oapi-codegen -config internal/clients/raidbots/codegen.yaml internal/clients/raidbots/client.yaml
+	oapi-codegen -config internal/clients/warcraftlogsql/models-codegen.yaml internal/clients/warcraftlogsql/models.yaml
 	go run github.com/Khan/genqlient ./internal/clients/warcraftlogsql/codegen.yaml

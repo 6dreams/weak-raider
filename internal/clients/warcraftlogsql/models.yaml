@@ -1,0 +1,101 @@
+openapi: 3.0.3
+info:
+  title: JSON-модели WarcraftLogs
+  version: 1.0.0
+  description: >-
+    Модели для GraphQL.
+paths: {}
+components:
+  schemas:
+    CharacterRankings:
+      type: object
+      required: [page, hasMorePages, count, rankings]
+      properties:
+        page:
+          type: integer
+          format: int64
+        hasMorePages:
+          type: boolean
+        count:
+          type: integer
+          format: int64
+        rankings:
+          type: array
+          items:
+            $ref: '#/components/schemas/CharacterRanking'
+    CharacterRanking:
+      type: object
+      required: [name, class, spec, amount, duration, startTime]
+      properties:
+        name:
+          type: string
+        class:
+          type: string
+        spec:
+          type: string
+        amount:
+          description: Урон или исцеление в секунду (DPS или HPS) в зависимости от запрошенной метрики.
+          type: number
+          format: double
+        duration:
+          description: Длительность боя в миллисекундах.
+          type: integer
+          format: int64
+        startTime:
+          description: Время начала боя в миллисекундах с начала эпохи Unix.
+          type: integer
+          format: int64
+        hardModeLevel:
+          type: integer
+          format: int64
+        bracketData:
+          type: number
+          format: double
+        faction:
+          type: integer
+          format: int64
+        report:
+          $ref: '#/components/schemas/RankingReport'
+        server:
+          $ref: '#/components/schemas/RankingServer'
+        talents:
+          description: Таланты персонажа. Поле может отсутствовать или быть null, если информация об участнике боя недоступна.
+          type: array
+          nullable: true
+          x-go-type-skip-optional-pointer: true
+          items:
+            $ref: '#/components/schemas/RankingTalent'
+    RankingTalent:
+      type: object
+      required: [talentID, points]
+      properties:
+        talentID:
+          type: integer
+          format: int64
+        points:
+          type: integer
+          format: int64
+    RankingReport:
+      type: object
+      required: [code, fightID, startTime]
+      properties:
+        code:
+          type: string
+        fightID:
+          type: integer
+          format: int64
+        startTime:
+          description: Время начала отчёта в миллисекундах с начала эпохи Unix.
+          type: integer
+          format: int64
+    RankingServer:
+      type: object
+      required: [id, name, region]
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        region:
+          type: string

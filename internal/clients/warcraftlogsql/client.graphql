@@ -839,7 +839,7 @@ type Encounter {
     Optional. The soulbind ID to filter to if viewing Shadowlands rankings.
     """
     soulbindID: Int = 0
-  ): JSON
+  ): CharacterRankingsJSON
 
   """
   Fight rankings information for a zone. This data is not considered frozen, and
@@ -1988,6 +1988,13 @@ enum HostilityType {
 }
 
 scalar JSON
+
+"""
+Local alias for Encounter.characterRankings, which is JSON on the WCL server.
+Keep it scalar in operations: the server does not accept a selection set here.
+The payload models are generated from models.yaml using oapi-codegen.
+"""
+scalar CharacterRankingsJSON
 
 """A filter for kills vs wipes and encounters vs trash."""
 enum KillType {
