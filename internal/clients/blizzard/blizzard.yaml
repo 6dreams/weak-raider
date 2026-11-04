@@ -25,6 +25,53 @@ paths:
             schema:
               $ref: '#/components/schemas/AuthTokenRequest'
 
+  /data/wow/mythic-keystone/season/index:
+    get:
+      operationId: mythicKeystoneSeasonsIndex
+      summary: Получить список сезонов Mythic+ и текущий сезон.
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MythicKeystoneSeasonsIndex'
+
+  /data/wow/connected-realm/{connectedRealmId}/mythic-leaderboard/index:
+    get:
+      operationId: mythicKeystoneLeaderboardsIndex
+      summary: Получить текущие таблицы лидеров Mythic+ объединённого игрового мира.
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/ConnectedRealmId'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MythicKeystoneLeaderboardsIndex'
+
+  /data/wow/mythic-keystone/dungeon/{dungeonId}:
+    get:
+      operationId: mythicKeystoneDungeon
+      summary: Получить сведения о подземелье Mythic+.
+      parameters:
+        - $ref: '#/components/parameters/Authorization'
+        - $ref: '#/components/parameters/Namespace'
+        - $ref: '#/components/parameters/MythicKeystoneDungeonId'
+      responses:
+        '200':
+          description: Успешный ответ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MythicKeystoneDungeon'
+
   /data/wow/journal-expansion/index?locale=en_US:
     get:
       operationId: journalExpansionIndex
@@ -163,6 +210,22 @@ components:
       required: true
       schema:
         type: string
+      in: path
+    ConnectedRealmId:
+      name: connectedRealmId
+      description: Идентификатор объединённого игрового мира.
+      required: true
+      schema:
+        type: integer
+        example: 1080
+      in: path
+    MythicKeystoneDungeonId:
+      name: dungeonId
+      description: Идентификатор подземелья Mythic+.
+      required: true
+      schema:
+        type: integer
+        example: 588
       in: path
     TalentTreeId:
       name: talentTreeId
@@ -326,6 +389,74 @@ components:
         name:
           $ref: '#/components/schemas/Translation'
 
+    MythicKeystoneSeasonsIndex:
+      type: object
+      required:
+        - seasons
+      properties:
+        seasons:
+          type: array
+          description: Список доступных сезонов Mythic+.
+          items:
+            $ref: '#/components/schemas/MythicKeystoneSeason'
+        current_season:
+          $ref: '#/components/schemas/MythicKeystoneSeason'
+
+    MythicKeystoneSeason:
+      type: object
+      description: Идентификатор сезона Mythic+.
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          description: Идентификатор сезона Mythic+.
+
+    MythicKeystoneLeaderboardsIndex:
+      type: object
+      required:
+        - current_leaderboards
+      properties:
+        current_leaderboards:
+          type: array
+          description: Текущие таблицы лидеров по подземельям Mythic+.
+          items:
+            type: object
+            required:
+              - id
+              - name
+            properties:
+              id:
+                type: integer
+                description: Идентификатор подземелья Mythic+.
+              name:
+                $ref: '#/components/schemas/Translation'
+
+    MythicKeystoneDungeon:
+      type: object
+      required:
+        - id
+        - name
+        - dungeon
+      properties:
+        id:
+          type: integer
+          description: Идентификатор подземелья Mythic+.
+        name:
+          $ref: '#/components/schemas/Translation'
+        dungeon:
+          type: object
+          description: Подземелье в журнале приключений.
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: integer
+              description: Journal Instance ID, используемый в таблице instances.
+            name:
+              $ref: '#/components/schemas/Translation'
+
     JEIndexResponse:
       type: object
       required:
@@ -404,7 +535,6 @@ components:
                 description: Ссылка на древо талантов
           name:
             $ref: '#/components/schemas/Translation'
-            description: Имя древа талантов
 
     TalentsResponse:
       type: object
@@ -438,8 +568,7 @@ components:
                 description: ID героического спека
               name:
                 $ref: '#/components/schemas/Translation'
-                description: Название героического спека
-              hero_talent_nodes: 
+              hero_talent_nodes:
                 $ref: '#/components/schemas/TalentNodesSet'
               # hero_talent_nodes:
               #   type: array

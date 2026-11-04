@@ -2,10 +2,10 @@ package manager
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"regexp"
+	"maps"
 	"weakRaider/internal/clients/blizzard"
+	"weakRaider/internal/domain/clients"
 	"weakRaider/internal/domain/entity"
 	"weakRaider/internal/domain/entity/types"
 	"weakRaider/internal/domain/repository"
@@ -19,77 +19,37 @@ const (
 )
 
 type TalentSync struct {
-	logger      *zerolog.Logger
-	talentRepo  *repository.TalentsRepository
-	authManager *AuthManager
-	blizzard    *blizzard.ClientWithResponses
+	logger         *zerolog.Logger
+	talentRepo     *repository.TalentsRepository
+	blizzardClient *clients.BlizzardClient
 }
 
 func NewTalentSync(
 	logger *zerolog.Logger,
 	talentRepo *repository.TalentsRepository,
-	authManager *AuthManager,
-	blizzard *blizzard.ClientWithResponses,
+	blizzardClient *clients.BlizzardClient,
 ) *TalentSync {
 	return &TalentSync{
-		talentRepo:  talentRepo,
-		authManager: authManager,
-		logger:      logger,
-		blizzard:    blizzard,
+		talentRepo:     talentRepo,
+		logger:         logger,
+		blizzardClient: blizzardClient,
 	}
 }
 
-func (t *TalentSync) Sync() error {
-	key, err := t.authManager.BlizzardKey()
-	if err != nil {
-		return fmt.Errorf("Talent sync, BlizzardKey: %w", err)
-	}
-
-	re, err := regexp.Compile(`talent-tree\/(\d+)\/playable-specialization\/(\d+)`)
-	if err != nil {
-		fmt.Errorf("Talent sync, regexp compile: %w", err)
-	}
-
-	talTreesResp, err := t.blizzard.GetTalentTreesWithResponse(
-		context.Background(),
-		&blizzard.GetTalentTreesParams{
-			BattlenetNamespace: blizzard.GetTalentTreesParamsBattlenetNamespaceStaticEu,
-			Authorization:      key,
-		},
-	)
+func (t *TalentSync) Sync(ctx context.Context) error {
+	talentTrees, err := t.blizzardClient.GetTalentTrees(ctx)
 
 	if err != nil {
 		return fmt.Errorf("talent sync, get talent trees: %w", err)
 	}
 
-	for _, spec := range talTreesResp.JSON200.SpecTalentTrees {
-		r := re.FindStringSubmatch(spec.Key.Href)
-		if len(r) != 3 {
-			log.Err(errors.New("bad regexp")).Msg("sync talents, find substring match")
-			continue
-		}
-
-		resp, err := t.blizzard.GetTalentsWithResponse(
-			context.Background(),
-			blizzard.TalentTreeId(r[1]),
-			blizzard.SpecId(r[2]),
-			&blizzard.GetTalentsParams{
-				BattlenetNamespace: blizzard.GetTalentsParamsBattlenetNamespaceStaticEu,
-				Authorization:      key,
-			},
-		)
+	for _, spec := range talentTrees {
+		res, err := t.blizzardClient.GetTalents(ctx, spec.TreeId, spec.SpecId)
 
 		if err != nil {
 			log.Err(err).Msg("sync talents, get talents")
 			continue
 		}
-
-		if resp.JSON200 == nil {
-			log.Err(ErrInvalidApiResponse).Msg("sync talents, nil json200")
-			continue
-		}
-
-		res := resp.JSON200
 
 		templateTalents := entity.Talents{
 			ClassName: types.NewTranslation(res.PlayableClass.Name),
@@ -99,11 +59,12 @@ func (t *TalentSync) Sync() error {
 			Talents:   make(map[int]entity.TalentNode),
 		}
 
-		parseTalents(&templateTalents, resp.JSON200.ClassTalentNodes)
-		parseTalents(&templateTalents, resp.JSON200.SpecTalentNodes)
+		parseTalents(&templateTalents, res.ClassTalentNodes)
+		parseTalents(&templateTalents, res.SpecTalentNodes)
 
-		for _, heroTals := range resp.JSON200.HeroTalentTrees {
+		for _, heroTals := range res.HeroTalentTrees {
 			classTalents := templateTalents
+			classTalents.Talents = maps.Clone(templateTalents.Talents)
 			if !isPlayable(classTalents.SpecID, heroTals.PlayableSpecializations) {
 				continue
 			}
@@ -111,7 +72,6 @@ func (t *TalentSync) Sync() error {
 			classTalents.HeroSpecID = heroTals.Id
 			classTalents.HeroSpecName = types.NewTranslation(heroTals.Name)
 			parseTalents(&classTalents, heroTals.HeroTalentNodes)
-			fmt.Println(classTalents)
 			err := t.talentRepo.Upsert(&classTalents)
 			if err != nil {
 				log.Err(err).Msg("sync talents, upsert classTalents")
@@ -137,7 +97,7 @@ func parseTalents(talents *entity.Talents, nodes blizzard.TalentNodesSet) error 
 		if node.NodeType.Id == choose {
 			tals, err := node.Ranks.AsChoiceOfTalents()
 			if err != nil {
-				return fmt.Errorf("Talent sync, as choice: %w", err)
+				return fmt.Errorf("talent sync, as choice: %w", err)
 			}
 			for _, tal := range tals {
 				for _, v := range tal.ChoiceOfTooltips {
@@ -152,7 +112,7 @@ func parseTalents(talents *entity.Talents, nodes blizzard.TalentNodesSet) error 
 
 		tals, err := node.Ranks.AsTalent()
 		if err != nil {
-			return fmt.Errorf("Talent sync, as talent: %w", err)
+			return fmt.Errorf("talent sync, as talent: %w", err)
 		}
 		for _, tal := range tals {
 			talents.Talents[tal.Tooltip.SpellTooltip.Spell.Id] = entity.TalentNode{

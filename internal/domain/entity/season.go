@@ -14,6 +14,9 @@ type Season struct {
 	// Идентификатор сезона по Blizzard, берётся из API Blizzard.
 	BlizzardId int `gorm:"column:blizzard_id;type:bigint;not null"`
 
+	// Идентификатор дополнения по Blizzard.
+	ExpansionId int `gorm:"column:expansion_id;type:bigint;not null"`
+
 	// Идентификатор сезона по WoWAudit, берётся из API WoWAudit.
 	WowAuditId sql.NullInt64 `gorm:"column:wow_audit_id;type:bigint;null"`
 

@@ -14,6 +14,13 @@ database:
     connMaxIdleTime: 5m
     connMaxLifeTime: 5m
 
-tickers:
-  daily_sync: 24h #wowAudit, seasons, talents
-  sync_dictionaries: 5s
+jobs:
+  default: 1h
+  dict_seasons:
+    period: 24h
+  dict_instances:
+    period: 24h
+  characters:
+    period: 24h
+  dict_talents:
+    period: 24h

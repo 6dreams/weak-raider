@@ -38,7 +38,7 @@ func (t *Translation) Scan(value interface{}) error {
 	if !ok {
 		return errors.New("failed to unmarshal translations data")
 	}
-	return json.Unmarshal(bytes, &t)
+	return json.Unmarshal(bytes, &t.Data)
 }
 
 func NewTranslation(data map[string]string) *Translation {

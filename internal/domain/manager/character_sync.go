@@ -2,7 +2,7 @@ package manager
 
 import (
 	"context"
-	"weakRaider/internal/clients/wowaudit"
+	"weakRaider/internal/domain/clients"
 	"weakRaider/internal/domain/entity"
 	"weakRaider/internal/domain/repository"
 
@@ -11,34 +11,28 @@ import (
 
 type CharacterSync struct {
 	characterRepo *repository.CharacterRepository
-	wowAudit      *wowaudit.ClientWithResponses
+	audit         *clients.Audit
 }
 
 func NewCharacterSync(
 	characterRepo *repository.CharacterRepository,
-	wowAudit *wowaudit.ClientWithResponses,
+	audit *clients.Audit,
 ) *CharacterSync {
-	return &CharacterSync{characterRepo: characterRepo, wowAudit: wowAudit}
+	return &CharacterSync{characterRepo: characterRepo, audit: audit}
 }
 
-func (c *CharacterSync) Sync(guild *entity.Guild) error {
+func (c *CharacterSync) Sync(ctx context.Context, guild *entity.Guild) error {
 	characters, err := c.characterRepo.FindAll(guild)
 	if err != nil {
 		return err
 	}
 
-	resp, err := c.wowAudit.GetCharactersWithResponse(
-		context.Background(),
-		&wowaudit.GetCharactersParams{Authorization: guild.WowauditKey},
-	)
+	auditCharacters, err := c.audit.GetCharacters(ctx, guild.WowauditKey)
 	if err != nil {
 		return err
 	}
-	if resp.JSON200 == nil {
-		return ErrInvalidApiResponse
-	}
 
-	for _, v := range *resp.JSON200 {
+	for _, v := range auditCharacters {
 		_, ok := characters[v.Name+v.Realm]
 		character := &entity.Character{
 			Name:    v.Name,
@@ -46,12 +40,9 @@ func (c *CharacterSync) Sync(guild *entity.Guild) error {
 			Rank:    v.Rank,
 			Role:    v.Role,
 			Realm:   v.Realm,
+			Note:    v.Note,
 			GuildId: guild.ID,
 			Guild:   guild,
-		}
-
-		if v.Note != nil {
-			character.Note = *v.Note
 		}
 
 		if !ok {

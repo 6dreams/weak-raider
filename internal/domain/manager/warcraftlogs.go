@@ -16,7 +16,7 @@ type authTransport struct {
 }
 
 func (t *authTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	key, err := t.authManager.LogsKey()
+	key, err := t.authManager.LogsKey(req.Context())
 
 	if err != nil {
 		return nil, err
@@ -37,7 +37,10 @@ func NewWarcraftLogs(auth *AuthManager) *WarcraftLogs {
 	}
 }
 
-func (w *WarcraftLogs) Sync() error {
+func (w *WarcraftLogs) Sync(ctx context.Context) error {
+
+	return nil // temp
+
 	httpClient := http.Client{
 		Transport: &authTransport{
 			authManager: w.auth,
@@ -47,7 +50,7 @@ func (w *WarcraftLogs) Sync() error {
 
 	client := graphql.NewClient(warcraftlogs.ServerUrlHttpswwwWarcraftlogsComapiv2client, &httpClient)
 
-	rankings, err := warcraftlogsql.GetEncounterRankings(context.TODO(), client, 3176, "Hunter", "BeastMastery", warcraftlogsql.CharacterRankingMetricTypeDps)
+	rankings, err := warcraftlogsql.GetEncounterRankings(ctx, client, 3176, "Hunter", "BeastMastery", warcraftlogsql.CharacterRankingMetricTypeDps)
 	if err != nil {
 		return err
 	}
