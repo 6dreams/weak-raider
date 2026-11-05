@@ -58,17 +58,11 @@ type Secrets struct {
 	WowAudit string `env:"WR_WOW_AUDIT_SECRET"`
 }
 
-// Tickers - contains all tickrates for API's
-type Tickers struct {
-	DailySync        time.Duration `yaml:"daily_sync"`
-	SyncDictionaries time.Duration `yaml:"sync_dictionaries"`
-}
-
 // Config - contains all configuration parameters in config package.
 type Config struct {
 	Project  Project  `yaml:"project"`
 	Database Database `yaml:"database"`
-	Tickers  Tickers  `yaml:"tickers"`
+	Jobs     Jobs     `yaml:"jobs"`
 	Auth     Secrets
 }
 

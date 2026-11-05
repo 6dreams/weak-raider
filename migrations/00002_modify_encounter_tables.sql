@@ -8,4 +8,3 @@ ALTER TABLE "encounter" ADD CONSTRAINT "fk_instance_encounters" FOREIGN KEY ("in
 ALTER TABLE "encounter" DROP CONSTRAINT "fk_instance_encounters";
 ALTER TABLE "encounter" DROP COLUMN "instance_id";
 ALTER TABLE "encounter" DROP COLUMN "blizzard_id";
-ALTER TABLE "encounter" ALTER COLUMN "logs_encounter_id" SET NOT NULL;

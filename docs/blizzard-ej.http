@@ -13,3 +13,18 @@ Authorization: Bearer {{access_token}}
 GET https://eu.api.blizzard.com/data/wow/journal-instance/1302
 Battlenet-Namespace: static-eu
 Authorization: Bearer {{access_token}}
+
+### Mythic-Keystone: Season list (получение текущего сезона)
+GET https://eu.api.blizzard.com/data/wow/mythic-keystone/season/index
+Battlenet-Namespace: dynamic-eu
+Authorization: Bearer {{access_token}}
+
+### LeaderBoard ключей: получаем текущие ключики по сезону.
+GET https://eu.api.blizzard.com/data/wow/connected-realm/1080/mythic-leaderboard/index
+Authorization: Bearer {{access_token}}
+Battlenet-Namespace: dynamic-eu
+
+### Mythic-Keystone: Dungeon - ID
+GET https://eu.api.blizzard.com/data/wow/mythic-keystone/dungeon/588
+Authorization: Bearer {{access_token}}
+Battlenet-Namespace: dynamic-eu
